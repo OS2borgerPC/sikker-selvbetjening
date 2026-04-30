@@ -19,7 +19,5 @@ useradd -u 1001 -m -s /bin/bash -c "Bruger" Bruger
 # Set password for Bruger user
 echo "Bruger:bruger" | chpasswd
 
-# enable mounting Bruger in RAM for ephemeral home
-systemctl enable home-Bruger.mount
-systemctl enable bruger-home-init.service
+
 

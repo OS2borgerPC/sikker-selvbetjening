@@ -162,4 +162,4 @@ printer:
 
 - [Root Schema: group-vars.schema.json](root.md)
 - [Wi-Fi Configuration Schema](wifi.md)
-- [About This Documentation](../about.md)
+- [Documentation Home](../index.md)

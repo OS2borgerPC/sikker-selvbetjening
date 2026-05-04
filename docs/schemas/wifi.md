@@ -111,4 +111,4 @@ wifi.hidden=true
 
 - [Root Schema: group-vars.schema.json](root.md)
 - [Printer Configuration Schema](printer.md)
-- [About This Documentation](../about.md)
+- [Documentation Home](../index.md)

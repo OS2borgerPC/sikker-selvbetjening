@@ -80,6 +80,6 @@ The root schema delegates detailed validation to section-specific schemas:
 
 ## See Also
 
-- [About This Documentation](../about.md)
+- [Documentation Home](../index.md)
 - [Printer Configuration](printer.md)
 - [Wi-Fi Configuration](wifi.md)

@@ -13,7 +13,7 @@ echo "superuser:superuser" | chpasswd
 echo "superuser ALL=(ALL) ALL" >> /etc/sudoers.d/superuser
 chmod 0440 /etc/sudoers.d/superuser
 
-# Create Bruger (user) with ephemeral home (wiped on every boot via tmpfs)
+# Create user 1001 for citizen use
 useradd -u 1001 -m -s /bin/bash -c "Bruger" Bruger
 
 # Set password for Bruger user

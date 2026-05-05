@@ -1,9 +1,0 @@
-# Auto-login configuration for Bruger user
-[org/gnome/login-screen]
-enable-fingerprint-authentication=false
-enable-smartcard-authentication=false
-enable-password-authentication=false
-enable-auto-login=true
-auto-login-user='Bruger'
-#timeout allows user to cancel auto-login by pressing a key during boot
-auto-login-user-timeout=10

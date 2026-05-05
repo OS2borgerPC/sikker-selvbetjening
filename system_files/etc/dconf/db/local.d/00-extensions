@@ -24,11 +24,17 @@ clock-show-weekday=true
 enable-hot-corners=false
 toolkit-accessibility=true
 
+# login screen
+[org/gnome/login-screen]
+enable-fingerprint-authentication=false
+enable-smartcard-authentication=false
+enable-password-authentication=false
+enable-auto-login=true
+
 # control
 [org/gnome/desktop/lockdown]
 disable-command-line=true
 disable-lock-screen=true
-disable-log-out=true
 disable-save-to-disk=true
 disable-show-password=true
 disable-user-switching=true
@@ -39,7 +45,7 @@ user-administration-disabled=true
 show-banners=false
 show-in-lock-screen=false
 
-# numlock
+# numlock (initial state, can still be toggled normally)
 [org/gnome/desktop/peripherals/keyboard]
 numlock-state=true
 

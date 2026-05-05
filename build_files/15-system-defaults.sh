@@ -31,6 +31,12 @@ EOF
 
 systemctl enable sikker-apply-firstboot-defaults.service
 
+# Ensure the superuser home directory is created on first boot (needed after
+# a fresh ISO install where /var is a stateful volume that starts empty).
+install -Dm0644 \
+	/ctx/system_files/usr/lib/tmpfiles.d/superuser-home.conf \
+	/usr/lib/tmpfiles.d/superuser-home.conf
+
 # Suppress GNOME Initial Setup even on direct bootc-based installs.
 install -d /etc/systemd/system /etc/systemd/user
 ln -snf /dev/null /etc/systemd/system/gnome-initial-setup.service

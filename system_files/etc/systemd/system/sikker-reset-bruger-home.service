@@ -1,0 +1,12 @@
+[Unit]
+Description=Reset Bruger home directory to template on boot
+After=local-fs.target
+Before=display-manager.service gdm.service systemd-user-sessions.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/sikker-reset-bruger-home
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

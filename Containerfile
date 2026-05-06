@@ -30,6 +30,9 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
 # Copy system files (config, services, scripts) into the image
 COPY --from=ctx /system_files/ /
 
+# Make libexec scripts executable
+RUN chmod 755 /usr/libexec/sikker-*
+
 # Update dconf database with new configurations
 RUN dconf update
 

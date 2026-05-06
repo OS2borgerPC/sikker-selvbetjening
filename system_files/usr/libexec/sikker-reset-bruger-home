@@ -1,0 +1,35 @@
+#!/bin/bash
+# Reset Bruger home directory to template on every boot
+# This creates a truly ephemeral user experience
+
+set -eux
+
+BRUGER_HOME=/home/Bruger
+TEMPLATE_DIR=/usr/template
+BRUGER_UID=1001
+BRUGER_GID=1001
+
+# Remove existing Bruger home directory if it exists
+if [ -d "$BRUGER_HOME" ]; then
+    rm -rf "$BRUGER_HOME"
+fi
+
+# Copy template to create fresh home directory
+cp -r "$TEMPLATE_DIR" "$BRUGER_HOME"
+
+# Set proper ownership for all files and directories
+chown -R "$BRUGER_UID:$BRUGER_GID" "$BRUGER_HOME"
+
+# Ensure home directory has correct permissions
+chmod 755 "$BRUGER_HOME"
+
+# Set restrictive permissions on sensitive directories
+chmod 700 "$BRUGER_HOME/.ssh" 2>/dev/null || true
+chmod 700 "$BRUGER_HOME/.gnupg" 2>/dev/null || true
+
+# Clear any existing bash history
+if [ -f "$BRUGER_HOME/.bash_history" ]; then
+    > "$BRUGER_HOME/.bash_history"
+fi
+
+echo "Bruger home directory reset to template"

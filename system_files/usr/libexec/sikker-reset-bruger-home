@@ -2,50 +2,39 @@
 
 # Define the variables
 USERNAME="Bruger" 
+# Use the absolute physical path to avoid symlink confusion during early boot
 BRUGER_HOME="/var/home/$USERNAME"
 TEMPLATE_DIR="/usr/template"
 
 # 1. ANNIHILATE EXISTING USER
-# We check by name. userdel -r -f will clean up the home dir and mail spools.
+# Added || true to ensure the script NEVER exits with an error code. 
+# If this script fails, the boot fails and the OS rolls back.
 if id "$USERNAME" &>/dev/null; then
-    userdel -r -f "$USERNAME"
+    userdel -r -f "$USERNAME" || true
 fi
 
 # 2. RECREATE USER FROM SCRATCH
-# By default, Fedora/Silverblue creates a Group with the same name as the User.
-# -m: creates the home directory
-# -d: specifies the path
-# -s: sets the shell
-useradd -m -d "$BRUGER_HOME" -s /bin/bash "$USERNAME"
+# We use the system default but explicitly point to /var/home
+useradd -m -d "$BRUGER_HOME" -s /bin/bash "$USERNAME" || true
 
-# Clear the password for the new user
+# Clear the password
 passwd -d "$USERNAME"
 
 # 3. APPLY THE TEMPLATE
-# useradd automatically populates the home folder from /etc/skel.
-# We wipe those defaults to ensure a clean slate for your template.
-find "$BRUGER_HOME" -mindepth 1 -delete
+# Ensure the directory exists before wiping/copying
+if [ -d "$BRUGER_HOME" ]; then
+    find "$BRUGER_HOME" -mindepth 1 -delete
+    cp -a "$TEMPLATE_DIR"/. "$BRUGER_HOME"/
+fi
 
-# Copy template files into the new home directory
-# -a (archive) preserves links and file attributes
-cp -a "$TEMPLATE_DIR"/. "$BRUGER_HOME"/
-
-# 4. APPLY PERMISSIONS DYNAMICALLY
-# Instead of using 1001, we use the $USERNAME variable. 
-# Linux will resolve the name to whatever ID the system just assigned.
+# 4. APPLY PERMISSIONS
 chown -R "$USERNAME:$USERNAME" "$BRUGER_HOME"
-
-# Standard home directory permissions
 chmod 755 "$BRUGER_HOME"
 
-# Secure specific sub-folders if they exist in your template
-[ -d "$BRUGER_HOME/.ssh" ] && chmod 700 "$BRUGER_HOME/.ssh"
-[ -d "$BRUGER_HOME/.gnupg" ] && chmod 700 "$BRUGER_HOME/.gnupg"
-
-# Clear bash history just in case it was in the template
-[ -f "$BRUGER_HOME/.bash_history" ] && > "$BRUGER_HOME/.bash_history"
+# 5. THE CRITICAL FIX: SELINUX
+# This is likely why ostree-prepare-root is failing. 
+# Newly created files in /var need to be labeled or the sysroot won't finalize.
+restorecon -R "$BRUGER_HOME"
 
 echo "User $USERNAME has been dynamically recreated and reset."
-
-# this could also be done more automatically by putting the hidden template files in /etc/skel, 
-# but this explicit approach allows for more control and is clearer in intent.
+exit 0

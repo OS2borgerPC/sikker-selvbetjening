@@ -1,35 +1,51 @@
 #!/bin/bash
-# Reset Bruger home directory to template on every boot
-# This creates a truly ephemeral user experience
 
-set -eux
+# Define the variables
+USERNAME="Bruger" 
+BRUGER_HOME="/var/home/$USERNAME"
+TEMPLATE_DIR="/usr/template"
 
-BRUGER_HOME=/home/Bruger
-TEMPLATE_DIR=/usr/template
-BRUGER_UID=1001
-BRUGER_GID=1001
-
-# Remove existing Bruger home directory if it exists
-if [ -d "$BRUGER_HOME" ]; then
-    rm -rf "$BRUGER_HOME"
+# 1. ANNIHILATE EXISTING USER
+# We check by name. userdel -r -f will clean up the home dir and mail spools.
+if id "$USERNAME" &>/dev/null; then
+    userdel -r -f "$USERNAME"
 fi
 
-# Copy template to create fresh home directory
-cp -r "$TEMPLATE_DIR" "$BRUGER_HOME"
+# 2. RECREATE USER FROM SCRATCH
+# By default, Fedora/Silverblue creates a Group with the same name as the User.
+# -m: creates the home directory
+# -d: specifies the path
+# -s: sets the shell
+useradd -m -d "$BRUGER_HOME" -s /bin/bash "$USERNAME"
 
-# Set proper ownership for all files and directories
-chown -R "$BRUGER_UID:$BRUGER_GID" "$BRUGER_HOME"
+# Clear the password for the new user
+passwd -d "$USERNAME"
 
-# Ensure home directory has correct permissions
+# 3. APPLY THE TEMPLATE
+# useradd automatically populates the home folder from /etc/skel.
+# We wipe those defaults to ensure a clean slate for your template.
+find "$BRUGER_HOME" -mindepth 1 -delete
+
+# Copy template files into the new home directory
+# -a (archive) preserves links and file attributes
+cp -a "$TEMPLATE_DIR"/. "$BRUGER_HOME"/
+
+# 4. APPLY PERMISSIONS DYNAMICALLY
+# Instead of using 1001, we use the $USERNAME variable. 
+# Linux will resolve the name to whatever ID the system just assigned.
+chown -R "$USERNAME:$USERNAME" "$BRUGER_HOME"
+
+# Standard home directory permissions
 chmod 755 "$BRUGER_HOME"
 
-# Set restrictive permissions on sensitive directories
-chmod 700 "$BRUGER_HOME/.ssh" 2>/dev/null || true
-chmod 700 "$BRUGER_HOME/.gnupg" 2>/dev/null || true
+# Secure specific sub-folders if they exist in your template
+[ -d "$BRUGER_HOME/.ssh" ] && chmod 700 "$BRUGER_HOME/.ssh"
+[ -d "$BRUGER_HOME/.gnupg" ] && chmod 700 "$BRUGER_HOME/.gnupg"
 
-# Clear any existing bash history
-if [ -f "$BRUGER_HOME/.bash_history" ]; then
-    > "$BRUGER_HOME/.bash_history"
-fi
+# Clear bash history just in case it was in the template
+[ -f "$BRUGER_HOME/.bash_history" ] && > "$BRUGER_HOME/.bash_history"
 
-echo "Bruger home directory reset to template"
+echo "User $USERNAME has been dynamically recreated and reset."
+
+# this could also be done more automatically by putting the hidden template files in /etc/skel, 
+# but this explicit approach allows for more control and is clearer in intent.

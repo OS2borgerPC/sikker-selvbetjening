@@ -15,10 +15,7 @@ chmod 0440 /etc/sudoers.d/superuser
 
 # Create user 1001 for citizen use
 # -M prevents initial home creation; template-based reset will handle it
-useradd -u 1001 -M -s /bin/bash -c "Bruger" Bruger
-
-# Set password for Bruger user
-echo "Bruger:bruger" | chpasswd
+useradd -M -s /bin/bash -c "Bruger" Bruger
 
 
 

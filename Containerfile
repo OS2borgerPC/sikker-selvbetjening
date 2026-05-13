@@ -36,6 +36,9 @@ RUN chmod 755 /usr/libexec/*.sh
 # Enable systemd services
 RUN systemctl enable sikker-reset-bruger-home.service
 
+# Enable usb-monitor service for all users 
+RUN systemctl --global enable usb-monitor.service
+
 # Update dconf database with new configurations
 RUN dconf update
 

@@ -21,6 +21,13 @@ while true; do
     # Extract the raw millisecond integer
     idle_ms=$(echo "$raw_idle" | awk '{print $2}' | tr -d ',)')
 
+    # SAFEGUARD: Validate that idle_ms is strictly a non-empty integer
+    if [[ ! "$idle_ms" =~ ^[0-9]+$ ]]; then
+        echo "[!] Warning: Invalid D-Bus response received. Retrying in next cycle..."
+        sleep 2
+        continue
+    fi
+
     # STATE 1: Unarmed. Wait for the idle time to drop near 0 (signaling a human arrived)
     if [ "$has_interacted" = false ]; then
         if [ "$idle_ms" -lt 2000 ]; then
@@ -31,31 +38,29 @@ while true; do
     # STATE 2: Armed. Monitor for 2 minutes of complete inactivity
     else
         if [ "$idle_ms" -ge "$IDLE_THRESHOLD" ]; then
-            echo "[!] 2 minutes of inactivity reached. Displaying warning dialog..."
+            echo "[!] 2 minutes of inactivity reached. Displaying single-button warning..."
 
-            # Launch the interactive Zenity dialog box
-            zenity --question \
+            # Launch the single-button Zenity warning dialog box
+            zenity --warning \
                    --title="Inactivity Warning" \
-                   --text="Are you still using this computer?\n\nFor your privacy, this computer will automatically restart and wipe all session data in 30 seconds." \
-                   --ok-label="Yes, keep working" \
-                   --cancel-label="No, log me out" \
+                   --text="Are you still there?\n\nClick the button below to keep working. Otherwise, this computer will automatically restart and wipe all session data in 30 seconds." \
+                   --ok-label="I'm still here!" \
                    --timeout=$PROMPT_TIMEOUT \
                    --width=450 \
                    --modal
 
             # Capture Zenity's exit status
-            # 0 = User clicked "Yes"
-            # 1 = User clicked "No"
-            # 5 = The 30-second timeout expired
             RESPONSE=$?
 
+            # 0 = User clicked "I'm still here!"
+            # 5 = The 30-second timeout expired
+            # 1 = User clicked the window "X" close button
             if [ "$RESPONSE" -eq 0 ]; then
-                echo "[+] User confirmed they are still here. Resetting idle tracker."
-                # Clicking the button naturally resets idle_ms to 0, so loop continues normally.
+                echo "[+] User confirmed presence. Resetting idle tracker."
+                # The physical click resets GNOME's idle timer to 0 automatically.
             else
-                echo "[-] Timeout reached ($RESPONSE). Executing secure reboot..."
-                # Use systemctl to safely reboot the machine
-                systemctl reboot
+                echo "[-] Timeout reached or dialog closed ($RESPONSE). Executing secure reboot..."
+                /usr/bin/systemctl reboot
             fi
         fi
     fi

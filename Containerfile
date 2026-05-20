@@ -51,11 +51,11 @@ RUN ln -sf /usr/share/zoneinfo/Europe/Copenhagen /etc/localtime && \
     echo "Europe/Copenhagen" > /etc/timezone
 
 # Set execution permissions
-RUN chmod +x /usr/libexec/kiosk-power-scheduler.py
+RUN chmod +x /usr/libexec/power-scheduler.py
 
 # MANUALLY ENABLE THE SERVICE (Bypasses systemd container build bugs)
 RUN mkdir -p /etc/systemd/system/multi-user.target.wants/ && \
-    ln -s /etc/systemd/system/kiosk-scheduler.service /etc/systemd/system/multi-user.target.wants/kiosk-scheduler.service
+    ln -s /etc/systemd/system/power-scheduler.service /etc/systemd/system/multi-user.target.wants/power-scheduler.service
 
 # Update dconf database with new configurations
 RUN dconf update

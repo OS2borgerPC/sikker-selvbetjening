@@ -73,7 +73,7 @@ while True:
                 target_state = yesterday_rule["state"]
                 wake_epoch = get_epoch_for_time(yesterday_rule["on_time"], 0)
 
-    # 3. Enforce the Active Power State
+# 3. Enforce the Active Power State
     if should_sleep:
         # Action A: Just blank the monitor backlight
         if target_state == "screen-off":
@@ -84,11 +84,23 @@ while True:
         elif target_state in ["suspend", "hibernate", "hybrid-sleep", "off"]:
             current_epoch = int(time.time())
             if wake_epoch and wake_epoch > current_epoch:
-                print(f"[!] Active Window: State '{target_state}' Enforced. Sleeping via rtcwake until {datetime.fromtimestamp(wake_epoch)}")
+                
+                # --- TRANSLATION MATRIX FOR RTCWAKE ---
+                # Maps clean human words to low-level Linux kernel keywords
+                rtcwake_modes = {
+                    "suspend": "mem",
+                    "hibernate": "disk",
+                    "hybrid-sleep": "hybrid",
+                    "off": "off"
+                }
+                rtc_mode = rtcwake_modes.get(target_state, "mem")
+                # --------------------------------------
+
+                print(f"[!] Active Window: State '{target_state}' Enforced. Sleeping via rtcwake ({rtc_mode}) until {datetime.fromtimestamp(wake_epoch)}")
                 time.sleep(3) # Let logs flush cleanly
                 
-                # Passes the exact keyword ("suspend", "off", etc.) straight into rtcwake
-                subprocess.run(f"rtcwake -m {target_state} -t {wake_epoch}", shell=True)
+                # Passes the translated keyword ("mem", "disk", etc.) straight into rtcwake
+                subprocess.run(f"rtcwake -m {rtc_mode} -t {wake_epoch}", shell=True)
                 print("[+] System woke up naturally or was manually interrupted. Re-evaluating schedule...")
     else:
         # Outside of a sleep window: ensure the display power is restored

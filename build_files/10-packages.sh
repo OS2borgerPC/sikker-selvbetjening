@@ -10,7 +10,9 @@ dnf5 install -y \
 	glibc-langpack-da \
 	libreoffice \
     libreoffice-langpack-da \
-	ansible
+	ansible \
+	grubby \
+	zenity
 # Use a COPR Example:
 # dnf5 -y copr enable ublue-os/staging
 # dnf5 -y install package
@@ -25,6 +27,8 @@ dnf5 install -y \
 # libreoffice: office suite
 # libreoffice-langpack-da: Danish language support for LibreOffice
 # ansible: configuration management and provisioning
+# zenity: dialog boxes for shell scripts
+# grubby: tool for managing bootloader configuration
 
 # Clean up package manager cache to reduce image size
 dnf clean all

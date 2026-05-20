@@ -27,8 +27,31 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build_files/build.sh
 
+# Copy system files (config, services, scripts) into the image
+COPY --from=ctx /system_files/ /
+
+# Make libexec scripts executable
+RUN chmod 755 /usr/libexec/*.sh
+
+# Enable systemd (root) services
+RUN systemctl enable sikker-reset-bruger-home.service
+
+# Enable user services 
+RUN systemctl --global enable usb-monitor.service
+RUN systemctl --global enable kiosk-monitor.service
+
+# Create the bootc kargs directory and write the parameters out to a TOML file
+# for a quieter boot experience and to hide systemd status messages
+RUN mkdir -p /usr/lib/bootc/kargs.d && \
+    echo 'kargs = ["quiet", "splash", "loglevel=3", "rd.systemd.show_status=false", "systemd.show_status=false"]' \
+    > /usr/lib/bootc/kargs.d/10-quiet-boot.toml
+
+# Update dconf database with new configurations
+RUN dconf update
+
 # Ship schema files for runtime consumers.
 COPY --from=ctx /system_files/usr/share/sikker-selvbetjening/schemas /usr/share/sikker-selvbetjening/schemas
+
     
 ### LINTING
 ## Verify final image and contents are correct.

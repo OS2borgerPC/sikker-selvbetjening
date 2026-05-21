@@ -61,12 +61,7 @@ RUN mkdir -p /etc/systemd/system/multi-user.target.wants/ && \
 RUN mkdir -p /etc/systemd/system.conf.d/ && \
     echo -e "[Manager]\nDefaultTimeoutStopSec=3s\nDefaultTimeoutAbortSec=3s" > /etc/systemd/system.conf.d/kiosk-timeout.conf
 
-# Configure a hidden 2-second GRUB safety net (technicians get 2 seconds to access grub through keypressing, which is hidden during boot)
-RUN sed -i 's/GRUB_TIMEOUT=[0-9]*/GRUB_TIMEOUT=2/g' /etc/default/grub && \
-    echo "GRUB_TIMEOUT_STYLE=hidden" >> /etc/default/grub && \
-    echo "GRUB_HANDSHAKE_TIMEOUT=2" >> /etc/default/grub
-
-# 1. Grant the 'kiosk' user permission to run kexec without a password
+# 1. Grant the 'kiosk' user permission to run kexec without a password (for faster shutdown/reboot)
 # 2. Secure the file permissions (Sudo will ignore this file if it is not set to 0440)
 RUN mkdir -p /etc/sudoers.d/ && \
     echo "kiosk ALL=(ALL) NOPASSWD: /usr/bin/systemctl kexec" > /etc/sudoers.d/kiosk-kexec && \

@@ -11,13 +11,13 @@ COPY --from=ctx /features/*/system_files/ /
 
 
 ### 2. MODIFICATIONS & BUILD LOOP
-# Mounts the features folder, discovers all build scripts, sorts them alphanumerically,
-# and runs them sequentially (05, 10, 15, 16, 21, 25, 30, etc.)
+# Discovers all build scripts, strips the path to sort strictly by filename numbers,
+# and executes them in perfect sequential order (05, 10, 15, 16, 21, 30, etc.)
 RUN --mount=type=bind,from=ctx,source=/features,target=/tmp/features \
     --mount=type=cache,dst=/var/cache \
     --mount=type=cache,dst=/var/log \
     --mount=type=tmpfs,dst=/tmp \
-    find /tmp/features/ -type f -path "*/build_files/*.sh" | sort | while read -r script; do \
+    find /tmp/features/ -type f -path "*/build_files/*.sh" | awk -F/ '{print $NF, $0}' | sort -n | cut -d' ' -f2- | while read -r script; do \
         echo "🚀 Running feature script: $(basename "$script")"; \
         bash "$script" || exit 1; \
     done

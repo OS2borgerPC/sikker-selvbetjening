@@ -5,6 +5,7 @@ on:
       - main
       - bartosz
       - agnete
+  workflow_dispatch:
 
 env:
   IMAGE_DESC: "Sikker Selvbetjening Image"

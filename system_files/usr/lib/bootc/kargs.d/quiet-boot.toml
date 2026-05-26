@@ -1,1 +1,0 @@
-kargs = ["quiet", "splash", "loglevel=3", "rd.systemd.show_status=false", "systemd.show_status=false"]

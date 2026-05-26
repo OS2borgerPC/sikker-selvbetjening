@@ -3,7 +3,7 @@ set -euo pipefail
 
 USERNAME="Bruger"
 BRUGER_HOME="/var/home/$USERNAME"
-TEMPLATE_DIR="/usr/template"
+TEMPLATE_DIR="/usr/Home"
 
 echo "Resetting user: $USERNAME"
 

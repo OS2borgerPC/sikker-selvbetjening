@@ -1,7 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Welcome Browser
-Comment=Launches the browser with specified tabs
-Exec=/usr/libexec/open-browser.sh
-X-GNOME-Autostart-enabled=true
-NoDisplay=true

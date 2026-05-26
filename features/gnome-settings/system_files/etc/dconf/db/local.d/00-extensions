@@ -1,0 +1,14 @@
+# using the same schema twice, will overwrite the former, so use arrays if necessary
+# arrays must not have any white space
+
+# dash-to-panel (windows-like taskbar)
+# apps-menu (windows-like start menu)
+[org/gnome/shell]
+enabled-extensions=['dash-to-panel@jderose9.github.com','apps-menu@gnome-shell-extensions.gcampax.github.com']
+
+# settings for dash-to-panel (taskbar)
+[org/gnome/shell/extensions/dash-to-panel]
+group-apps=false
+show-running-apps=true
+overview-click-to-exit=true
+hide-overview-on-startup=true

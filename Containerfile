@@ -1,68 +1,40 @@
-# Allow build scripts to be referenced without being copied into the final image
+# Context stage pointing to our new encapsulated features folder
 FROM scratch AS ctx
-COPY build_files /build_files
-COPY system_files /system_files
+COPY features /features
 
 # Base Image
 FROM quay.io/fedora-ostree-desktops/silverblue:42
 
-### [IM]MUTABLE /opt
-## Some bootable images, like Fedora, have /opt symlinked to /var/opt, in order to
-## make it mutable/writable for users. However, some packages write files to this directory,
-## thus its contents might be wiped out when bootc deploys an image, making it troublesome for
-## some packages. Eg, google-chrome, docker-desktop.
-##
-## Uncomment the following line if one desires to make /opt immutable and be able to be used
-## by the package manager.
+### 1. DISTRIBUTE SYSTEM FILES
+# Merges all 'system_files' directories across all features directly into the OS root
+COPY --from=ctx /features/*/system_files/ /
 
-# RUN rm /opt && mkdir /opt
 
-### MODIFICATIONS
-## make modifications desired in your image and install packages by modifying the build.sh script
-## the following RUN directive does all the things required to run "build.sh" as recommended.
-
-RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+### 2. MODIFICATIONS & BUILD LOOP
+# Mounts the features folder, discovers all build scripts, sorts them alphanumerically,
+# and runs them sequentially (05, 10, 15, 16, 21, 25, 30, etc.)
+RUN --mount=type=bind,from=ctx,source=/features,target=/tmp/features \
     --mount=type=cache,dst=/var/cache \
     --mount=type=cache,dst=/var/log \
     --mount=type=tmpfs,dst=/tmp \
-    /ctx/build_files/build.sh
+    find /tmp/features/ -type f -path "*/build_files/*.sh" | sort | while read -r script; do \
+        echo "🚀 Running feature script: $(basename "$script")"; \
+        bash "$script" || exit 1; \
+    done
 
-# Copy system files (config, services, scripts) into the image
-COPY --from=ctx /system_files/ /
 
-# Make libexec scripts executable
-RUN chmod 755 /usr/libexec/*.sh
-
-# Enable systemd (root) services
-RUN systemctl enable sikker-reset-bruger-home.service
-
-# Enable user services 
-RUN systemctl --global enable usb-monitor.service
-RUN systemctl --global enable kiosk-monitor.service
-
-# make sure timezone is set to Copenhagen
+### 3. GLOBAL ENVIRONMENT & PERMISSIONS ENFORCEMENTS
+# Set timezone to Copenhagen
 RUN ln -sf /usr/share/zoneinfo/Europe/Copenhagen /etc/localtime && \
     echo "Europe/Copenhagen" > /etc/timezone
 
-# Set execution permissions
-RUN chmod +x /usr/libexec/power-scheduler.py
+# Uniformly enforce executable permissions on all target shell and python scripts
+RUN chmod 755 /usr/libexec/*.sh /usr/libexec/*.py 2>/dev/null || true
 
-# MANUALLY ENABLE THE SERVICE (Bypasses systemd container build bugs)
-RUN mkdir -p /etc/systemd/system/multi-user.target.wants/ && \
-    ln -s /etc/systemd/system/power-scheduler.service /etc/systemd/system/multi-user.target.wants/power-scheduler.service
-
-# Grant passwordless execution for both standard and forced reboot commands
-RUN mkdir -p /etc/sudoers.d/ && \
-    echo "kiosk ALL=(ALL) NOPASSWD: /usr/bin/systemctl reboot, /usr/bin/systemctl reboot -f, /bin/systemctl reboot, /bin/systemctl reboot -f" > /etc/sudoers.d/99-kiosk && \
-    chmod 0440 /etc/sudoers.d/99-kiosk
-
-# Update dconf database with new configurations
+# Compile dconf configurations
 RUN dconf update
 
-# Ship schema files for runtime consumers.
-COPY --from=ctx /system_files/usr/share/sikker-selvbetjening/schemas /usr/share/sikker-selvbetjening/schemas
-
     
-### LINTING
-## Verify final image and contents are correct.
+### 4. LINTING
+# Verify final bootc image and contents are correct
 RUN bootc container lint

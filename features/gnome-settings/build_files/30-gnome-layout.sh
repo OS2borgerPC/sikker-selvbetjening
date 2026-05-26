@@ -1,8 +1,8 @@
 #!/bin/bash
-
 set -ouex pipefail
 
-# Copy all dconf defaults
-cp -r /ctx/system_files/etc/dconf/db/local.d/* /etc/dconf/db/local.d/
+# Note: The configuration files under etc/dconf/db/local.d/ 
+# are already copied into place automatically by the Containerfile.
 
+# Compile the dconf database so the system recognizes the new settings
 dconf update

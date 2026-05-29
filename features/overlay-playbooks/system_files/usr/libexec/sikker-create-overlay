@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Applies a configuration overlay by running the local Ansible playbook.
+# Expects: configuration overlay file (JSON), assets root, and output root.
+set -euo pipefail
+
+die() {
+  echo "$*" >&2
+  exit 1
+}
+
+CONFIGURATION_OVERLAY="${1:?configuration overlay file required}"
+ASSETS_ROOT="${2:?assets root required}"
+OUTPUT_ROOT="${3:?output root required}"
+OVERLAY_PLAYBOOK_ROOT="${SIKKER_OVERLAY_PLAYBOOK_DIR:-/usr/libexec/sikker-overlay-playbooks}"
+PLAYBOOK_FILE="${OVERLAY_PLAYBOOK_ROOT}/site.yml"
+ANSIBLE_CONFIG_FILE="${OVERLAY_PLAYBOOK_ROOT}/ansible.cfg"
+
+[[ -f "${CONFIGURATION_OVERLAY}" ]] || die "Missing configuration overlay file: ${CONFIGURATION_OVERLAY}"
+[[ -d "${ASSETS_ROOT}" ]] || die "Missing assets root directory: ${ASSETS_ROOT}"
+mkdir -p "${OUTPUT_ROOT}"
+[[ -d "${OVERLAY_PLAYBOOK_ROOT}" ]] || die "Missing overlay playbook directory: ${OVERLAY_PLAYBOOK_ROOT}"
+[[ -f "${PLAYBOOK_FILE}" ]] || die "Missing overlay playbook: ${PLAYBOOK_FILE}"
+command -v ansible-playbook >/dev/null 2>&1 || die "ansible-playbook is not installed"
+
+export ANSIBLE_CONFIG="${ANSIBLE_CONFIG_FILE}"
+export ANSIBLE_NOCOWS=1
+
+ansible-playbook \
+  -i localhost, \
+  -c local \
+  "${PLAYBOOK_FILE}" \
+  --extra-vars "@${CONFIGURATION_OVERLAY}" \
+  --extra-vars "assets_root=${ASSETS_ROOT}" \
+  --extra-vars "output_root=${OUTPUT_ROOT}"

@@ -1,0 +1,26 @@
+---
+- name: Build configuration overlay
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Ensure overlay output root exists
+      ansible.builtin.file:
+        path: "{{ output_root | mandatory }}"
+        state: directory
+        mode: "0755"
+
+    - name: Discover overlay task files
+      ansible.builtin.find:
+        paths: "{{ playbook_dir }}/tasks"
+        patterns: "*.yml"
+        file_type: file
+        recurse: false
+      register: overlay_domain_task_files
+
+    - name: Render overlay tasks
+      ansible.builtin.include_tasks: "{{ item.path }}"
+      loop: "{{ overlay_domain_task_files.files | sort(attribute='path') }}"
+      loop_control:
+        label: "{{ item.path | basename }}"

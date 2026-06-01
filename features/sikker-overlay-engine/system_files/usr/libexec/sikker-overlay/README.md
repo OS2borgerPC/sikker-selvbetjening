@@ -24,7 +24,36 @@ The entrypoint passes the JSON payload to Ansible with `--extra-vars @payload.js
 
 `site.yml` discovers every `*.yml` file in `tasks/` and includes them in lexical order. To add a new overlay domain, add a new task file in `tasks/` (for example `30-printer.yml`).
 
-Each domain task file should guard itself with `when` so it becomes a no-op when that JSON section is absent.
+Each domain task file should either guard itself with `when` (no-op when JSON is absent) or implement the default-first pattern below when sensible defaults should still be rendered.
+
+## Default-First Task Pattern
+
+When a domain has sensible defaults, prefer a default-first pattern over a full file-level guard.
+
+1. Resolve effective values up front with `set_fact` using `default(...)`.
+2. Render default output unconditionally.
+3. Apply config-driven overrides only behind narrow `when` checks.
+
+This keeps behavior predictable: missing config still produces valid output with defaults.
+
+Example:
+
+```yaml
+- name: Resolve effective values
+	ansible.builtin.set_fact:
+		feature_input: "{{ ((feature | default({})).input | default('default')) }}"
+
+- name: Render defaults
+	ansible.builtin.copy:
+		dest: "{{ output_root }}/..."
+		content: "...{{ feature_input }}..."
+
+- name: Apply optional override artifact
+	when: ((feature | default({})).artifact | default('')) | length > 0
+	ansible.builtin.copy:
+		src: "{{ assets_root }}/..."
+		dest: "{{ output_root }}/..."
+```
 
 ## Important Constraint
 

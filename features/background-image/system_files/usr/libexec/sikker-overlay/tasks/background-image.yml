@@ -1,14 +1,8 @@
 ---
-- name: Resolve effective desktop background values
+- name: Background image override
   ansible.builtin.set_fact:
     background_image_file: "{{ ((desktop | default({})).background_image_file | default('')) | string }}"
     background_image_relpath: "usr/share/backgrounds/sikker-selvbetjening/background-image"
-
-- name: Ensure background destination directory exists
-  ansible.builtin.file:
-    path: "{{ output_root }}/usr/share/backgrounds/sikker-selvbetjening"
-    state: directory
-    mode: "0755"
 
 - name: Resolve desktop background asset path
   when: background_image_file | length > 0

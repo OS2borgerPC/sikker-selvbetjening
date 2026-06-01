@@ -1,5 +1,5 @@
 ---
-- name: Render desktop settings
+- name: Render wallpaper
   when:
     - desktop is defined
     - (desktop.background_image_file | default('')) | length > 0

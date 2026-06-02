@@ -13,6 +13,12 @@
       ansible.builtin.set_fact:
         background_image_asset_relpath: "{{ background_image_file | overlay_asset_relpath }}"
 
+    - name: Ensure background directory exists
+      ansible.builtin.file:
+        path: "{{ output_root }}/usr/share/backgrounds/sikker-selvbetjening"
+        state: directory
+        mode: "0755"
+
     - name: Override default background with configured asset
       ansible.builtin.copy:
         src: "{{ assets_root }}/{{ background_image_asset_relpath }}"

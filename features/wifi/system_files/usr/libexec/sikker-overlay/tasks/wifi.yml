@@ -15,7 +15,3 @@
         src: templates/wifi.nmconnection.j2
         dest: "{{ output_root }}/etc/NetworkManager/system-connections/{{ wifi.ssid }}.nmconnection"
         mode: "0600"
-
-    - name: Set WiFi radio state
-      ansible.builtin.command: >
-        nmcli radio wifi {{ 'on' if (wifi.enabled | default(true)) else 'off' }}

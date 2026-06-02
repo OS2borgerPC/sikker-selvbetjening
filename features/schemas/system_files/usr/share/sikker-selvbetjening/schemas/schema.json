@@ -123,10 +123,6 @@
             "hidden": {
               "type": "boolean",
               "description": "Whether the SSID is hidden and requires active probing by the client."
-            },
-            "enabled": {
-              "type": "boolean",
-              "description": "Whether Wi-Fi radio is enabled. If false, Wi-Fi is turned off globally."
             }
           }
         }

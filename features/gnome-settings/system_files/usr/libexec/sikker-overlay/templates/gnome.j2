@@ -1,0 +1,7 @@
+{% for schema, keys in gnome.items() %}
+[{{ schema }}]
+{% for key, value in keys.items() %}
+{{ key }}={{ value | to_dconf }}
+{% endfor %}
+
+{% endfor %}

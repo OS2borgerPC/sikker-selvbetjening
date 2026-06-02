@@ -1,0 +1,15 @@
+- name: Render GNOME settings
+  when:
+    - gnome is defined
+  block:
+    - name: Ensure dconf directory exists
+      ansible.builtin.file:
+        path: "{{ output_root }}/etc/dconf/db/local.d"
+        state: directory
+        mode: "0755"
+
+    - name: Write GNOME settings
+      ansible.builtin.template:
+        src: templates/gnome.j2
+        dest: "{{ output_root }}/etc/dconf/db/local.d/01-favorite-apps"
+        mode: "0644"

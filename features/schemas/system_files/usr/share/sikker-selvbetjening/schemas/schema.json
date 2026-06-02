@@ -118,8 +118,7 @@
             },
             "psk": {
               "type": "string",
-              "description": "Pre-shared key for the wireless network. This is sensitive data and should eventually be replaced by a runtime secret reference.",
-              "minLength": 1
+              "description": "Pre-shared key for the wireless network. This is sensitive data and should eventually be replaced by a runtime secret reference."
             },
             "hidden": {
               "type": "boolean",

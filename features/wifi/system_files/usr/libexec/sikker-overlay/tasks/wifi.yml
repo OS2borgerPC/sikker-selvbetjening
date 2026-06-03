@@ -11,7 +11,7 @@
         mode: "0700"
 
     - name: Write WiFi NetworkManager connection
-      ansible.builtin.template:
+      ansible.builtin.copy:
         dest: "{{ output_root }}/etc/NetworkManager/system-connections/{{ wifi.ssid }}.nmconnection"
         mode: "0600"
         content: |

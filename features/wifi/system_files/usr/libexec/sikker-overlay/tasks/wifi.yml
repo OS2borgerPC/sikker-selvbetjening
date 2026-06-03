@@ -12,6 +12,29 @@
 
     - name: Write WiFi NetworkManager connection
       ansible.builtin.template:
-        src: templates/wifi.nmconnection.j2
         dest: "{{ output_root }}/etc/NetworkManager/system-connections/{{ wifi.ssid }}.nmconnection"
         mode: "0600"
+        content: |
+          [connection]
+          id={{ wifi.ssid }}
+          type=wifi
+          autoconnect=true
+
+          [wifi]
+          ssid={{ wifi.ssid }}
+          mode=infrastructure
+          {% if wifi.hidden | default(false) | bool %}
+          hidden=true
+          {% endif %}
+          {% if (wifi.psk | default('')) | length > 0 %}
+
+          [wifi-security]
+          key-mgmt=wpa-psk
+          psk={{ wifi.psk }}
+          {% endif %}
+
+          [ipv4]
+          method=auto
+
+          [ipv6]
+          method=auto

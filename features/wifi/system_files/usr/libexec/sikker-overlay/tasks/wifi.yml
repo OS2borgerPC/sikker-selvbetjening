@@ -4,37 +4,69 @@
     - wifi is defined
     - (wifi.ssid | default('')) | length > 0
   block:
-    - name: Ensure NetworkManager connection directory exists
-      ansible.builtin.file:
-        path: "{{ output_root }}/etc/NetworkManager/system-connections"
-        state: directory
-        mode: "0700"
+    - name: Update post-steps with WiFi cleanup
+      block:
+        - name: Read post-steps configuration
+          ansible.builtin.slurp:
+            path: "{{ output_root }}/post-steps.json"
+          register: post_steps_raw
 
-    - name: Write WiFi NetworkManager connection
-      ansible.builtin.copy:
-        dest: "{{ output_root }}/etc/NetworkManager/system-connections/{{ wifi.ssid }}.nmconnection"
-        mode: "0600"
-        content: |
-          [connection]
-          id={{ wifi.ssid }}
-          type=wifi
-          autoconnect=true
+        - name: Parse post-steps configuration
+          ansible.builtin.set_fact:
+            post_steps_doc: "{{ post_steps_raw.content | b64decode | from_json }}"
+            wifi_cleanup_step:
+              action: run
+              command: rm
+              args:
+                - -f
+                - /etc/NetworkManager/conf.d/disable-wifi.conf
 
-          [wifi]
-          ssid={{ wifi.ssid }}
-          mode=infrastructure
-          {% if wifi.hidden | default(false) | bool %}
-          hidden=true
-          {% endif %}
-          {% if (wifi.psk | default('')) | length > 0 %}
+        - name: Add WiFi cleanup step when missing
+          ansible.builtin.set_fact:
+            post_steps_doc: "{{ post_steps_doc | combine({'steps': (post_steps_doc.steps | default([])) + [wifi_cleanup_step]}, recursive=True) }}"
+          when: wifi_cleanup_step not in (post_steps_doc.steps | default([]))
 
-          [wifi-security]
-          key-mgmt=wpa-psk
-          psk={{ wifi.psk }}
-          {% endif %}
+        - name: Write post-steps configuration
+          ansible.builtin.copy:
+            dest: "{{ output_root }}/post-steps.json"
+            mode: "0644"
+            content: "{{ post_steps_doc | to_nice_json }}\n"
 
-          [ipv4]
-          method=auto
+    - name: Render WiFi NetworkManager profile
+      block:
+        - name: Ensure NetworkManager connection directory exists
+          ansible.builtin.file:
+            path: "{{ output_root }}/etc/NetworkManager/system-connections"
+            state: directory
+            mode: "0700"
 
-          [ipv6]
-          method=auto
+        - name: Write WiFi NetworkManager connection
+          ansible.builtin.copy:
+            dest: "{{ output_root }}/etc/NetworkManager/system-connections/{{ wifi.ssid }}.nmconnection"
+            mode: "0600"
+            content: |
+              [connection]
+              id={{ wifi.ssid }}
+              type=wifi
+              autoconnect=true
+
+              [wifi]
+              ssid={{ wifi.ssid }}
+              mode=infrastructure
+              {% if wifi.hidden | default(false) | bool %}
+              hidden=true
+              {% endif %}
+              {% if (wifi.psk | default('')) | length > 0 %}
+
+              [wifi-security]
+              key-mgmt=wpa-psk
+              psk={{ wifi.psk }}
+              {% endif %}
+
+              [ipv4]
+              method=auto
+
+              [ipv6]
+              method=auto
+
+

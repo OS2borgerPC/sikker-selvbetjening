@@ -1,7 +1,6 @@
 - name: Render GNOME favorite apps
   when:
     - favorite_apps is defined
-    - favorite_apps.apps is defined
     - (favorite_apps.apps | length) > 0
   block:
 

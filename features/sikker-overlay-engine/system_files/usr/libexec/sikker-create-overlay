@@ -12,7 +12,7 @@ CONFIGURATION_OVERLAY="${1:?configuration overlay file required}"
 ASSETS_ROOT="${2:?assets root required}"
 OUTPUT_ROOT="${3:?output root required}"
 OVERLAY_PLAYBOOK_ROOT="${SIKKER_OVERLAY_PLAYBOOK_DIR:-/usr/libexec/sikker-overlay}"
-PLAYBOOK_FILE="${OVERLAY_PLAYBOOK_ROOT}/site.yml"
+PLAYBOOK_FILE="${OVERLAY_PLAYBOOK_ROOT}/sikker-create-overlay.yml"
 ANSIBLE_CONFIG_FILE="${OVERLAY_PLAYBOOK_ROOT}/ansible.cfg"
 
 [[ -f "${CONFIGURATION_OVERLAY}" ]] || die "Missing configuration overlay file: ${CONFIGURATION_OVERLAY}"

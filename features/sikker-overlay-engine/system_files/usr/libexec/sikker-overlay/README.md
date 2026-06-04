@@ -14,15 +14,15 @@ The entrypoint passes the JSON payload to Ansible with `--extra-vars @payload.js
 
 ## Layout
 
-- `site.yml`: master playbook executed by `sikker-create-overlay`
-- `tasks/`: auto-discovered overlay task files (no `site.yml` edit needed)
+- `sikker-create-overlay.yml`: master playbook executed by `sikker-create-overlay`
+- `tasks/`: auto-discovered overlay task files (no `sikker-create-overlay.yml` edit needed)
 - `templates/`: staged file templates written into `output_root`
 - `filter_plugins/`: small Python filters used from playbooks
 - `ansible.cfg`: local Ansible settings for this overlay runner
 
 ## Domain Autoloading
 
-`site.yml` discovers every `*.yml` file in `tasks/` and includes them in lexical order. To add a new overlay domain, add a new task file in `tasks/` (for example `30-printer.yml`).
+`sikker-create-overlay.yml` discovers every `*.yml` file in `tasks/` and includes them in lexical order. To add a new overlay domain, add a new task file in `tasks/` (for example `30-printer.yml`).
 
 Each domain task file should either guard itself with `when` (no-op when JSON is absent) or implement the default-first pattern below when sensible defaults should still be rendered.
 
@@ -61,4 +61,4 @@ This code runs inside the build container to generate files for a later image bu
 
 ## Extending The Overlay
 
-Add a new section by including another task file from `site.yml` and writing all outputs beneath `{{ output_root }}`. Keep any schema changes coordinated with the downstream configuration repository, because the JSON payload shape is part of the compatibility contract.
+Add a new section by including another task file from `sikker-create-overlay.yml` and writing all outputs beneath `{{ output_root }}`. Keep any schema changes coordinated with the downstream configuration repository, because the JSON payload shape is part of the compatibility contract.

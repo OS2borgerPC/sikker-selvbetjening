@@ -10,6 +10,14 @@
         state: directory
         mode: "0700"
 
+    - name: Ensure WiFi is enabled system-wide
+      ansible.builtin.copy:
+        dest: "{{ output_root }}/etc/NetworkManager/conf.d/10-wifi-enabled.conf"
+        mode: "0644"
+        content: |
+          [main]
+          wifi=enabled
+
     - name: Write WiFi NetworkManager connection
       ansible.builtin.copy:
         dest: "{{ output_root }}/etc/NetworkManager/system-connections/{{ wifi.ssid }}.nmconnection"
@@ -38,3 +46,28 @@
 
           [ipv6]
           method=auto
+
+
+- name: Disable WiFi when not configured
+  when:
+    - wifi is not defined or (wifi.ssid | default('')) | length == 0
+  block:
+    - name: Ensure NetworkManager conf.d exists
+      ansible.builtin.file:
+        path: "{{ output_root }}/etc/NetworkManager/conf.d"
+        state: directory
+        mode: "0755"
+
+    - name: Disable WiFi via NetworkManager config
+      ansible.builtin.copy:
+        dest: "{{ output_root }}/etc/NetworkManager/conf.d/disable-wifi.conf"
+        mode: "0644"
+        content: |
+          [device]
+          wifi.scan-rand-mac-address=no
+
+          [main]
+          plugins=keyfile
+
+          [keyfile]
+          unmanaged-devices=type:wifi

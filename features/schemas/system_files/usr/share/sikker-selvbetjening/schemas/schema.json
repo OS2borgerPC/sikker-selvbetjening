@@ -129,6 +129,23 @@
         }
       }
     },
+    "favorite-apps": {
+      "title": "Favorite Apps Section",
+      "description": "GNOME shell favorite applications configuration.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "apps": {
+          "type": "array",
+          "description": "List of application desktop IDs pinned to GNOME favorites.",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
     "build_target_entry": {
       "type": "object",
       "additionalProperties": false,

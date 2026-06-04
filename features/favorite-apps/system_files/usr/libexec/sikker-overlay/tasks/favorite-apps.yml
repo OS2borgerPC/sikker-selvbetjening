@@ -1,0 +1,20 @@
+- name: Render GNOME favorite apps
+  when:
+    - favorite_apps is defined
+    - favorite_apps.apps is defined
+    - (favorite_apps.apps | length) > 0
+  block:
+
+    - name: Ensure dconf directory exists
+      ansible.builtin.file:
+        path: "{{ output_root }}/etc/dconf/db/local.d"
+        state: directory
+        mode: "0755"
+
+    - name: Write GNOME favorite apps file
+      ansible.builtin.copy:
+        dest: "{{ output_root }}/etc/dconf/db/local.d/favorite-apps"
+        mode: "0644"
+        content: |
+          [org/gnome/shell]
+          favorite-apps=[{% for app in favorite_apps.apps %}'{{ app }}'{% if not loop.last %},{% endif %}{% endfor %}]

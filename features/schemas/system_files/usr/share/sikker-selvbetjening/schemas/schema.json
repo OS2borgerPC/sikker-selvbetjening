@@ -126,22 +126,16 @@
               "description": "Whether the SSID is hidden and requires active probing by the client."
             }
           }
-        }
-      }
-    },
-    "favorite-apps": {
-      "title": "Favorite Apps Section",
-      "description": "GNOME shell favorite applications configuration.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "apps": {
-          "type": "array",
-          "description": "List of application desktop IDs pinned to GNOME favorites.",
-          "minItems": 1,
-          "items": {
-            "type": "string",
-            "minLength": 1
+        },
+        "favorite-apps": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "apps": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            }
           }
         }
       }

@@ -3,7 +3,7 @@ FROM scratch AS ctx
 COPY features /features
 
 # Base Image
-FROM quay.io/fedora-ostree-desktops/silverblue:42
+FROM quay.io/fedora-ostree-desktops/silverblue:43
 
 ### 1. DISTRIBUTE SYSTEM FILES
 # Merges all 'system_files' directories across all features directly into the OS root

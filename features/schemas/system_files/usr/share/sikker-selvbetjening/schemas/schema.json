@@ -127,7 +127,7 @@
             }
           }
         },
-        "favorite-apps": {
+        "favorite_apps": {
           "type": "object",
           "additionalProperties": false,
           "properties": {

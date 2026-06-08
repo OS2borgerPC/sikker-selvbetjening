@@ -1,7 +1,7 @@
 - name: Render GNOME favorite apps
   when:
-    - favorite-apps is defined
-    - (favorite-apps.apps | length) > 0
+    - favorite_apps is defined
+    - (favorite_apps.apps | length) > 0
   block:
 
     - name: Ensure dconf directory exists

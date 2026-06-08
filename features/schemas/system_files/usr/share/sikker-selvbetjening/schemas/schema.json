@@ -137,8 +137,18 @@
               "minItems": 1
             }
           }
+        },
+        "firefox_urls": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "urls": {
+              "type": "array",
+              "items": { "type": "string", "format": "uri" },
+              "minItems": 1
+            }
+          }
         }
-      }
     },
     "build_target_entry": {
       "type": "object",

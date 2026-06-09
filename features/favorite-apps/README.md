@@ -71,7 +71,7 @@ config/config.yml
 
 ### 2. Find eller opret `favorite_apps` sektionen
 
-Under `groups:` skal du finde (eller oprette):
+Under `policies:` skal du finde (eller oprette):
 
 ```yaml
 favorite_apps:

@@ -28,7 +28,7 @@ selve opbygningen af Wi-Fi-forbindelsen, når der findes en `wifi` sektion i bui
 
 ## Sådan angiver du Wi-Fi
 
-Hvis du vil have systemet til at oprette en Wi-Fi-forbindelse automatisk, skal du definere et `wifi`-objekt i den relevante overlay- eller target-konfiguration.
+Hvis du vil have systemet til at oprette en Wi-Fi-forbindelse automatisk, skal du tilføje `wifi`-policy i den relevante device group konfiguration.
 
 ### Eksempel
 

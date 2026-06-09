@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "./schema.json",
   "title": "Sikker Selvbetjening Combined Config",
-  "description": "Single configuration schema that holds both groups and build_targets per domain.",
+  "description": "Single configuration schema that holds both policies and device_groups per domain.",
   "type": "object",
   "additionalProperties": false,
   "required": ["domains"],
@@ -19,7 +19,7 @@
     "domain_entry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["domain", "groups", "build_targets"],
+      "required": ["domain", "policies", "device_groups"],
       "properties": {
         "domain": {
           "type": "string",
@@ -27,31 +27,31 @@
           "pattern": "^[a-z][a-z0-9_-]*$",
           "minLength": 1
         },
-        "groups": {
+        "policies": {
           "type": "array",
-          "description": "List of configuration groups for this domain.",
+          "description": "List of configuration policies for this domain.",
           "minItems": 1,
           "items": {
-            "$ref": "#/$defs/group_entry"
+            "$ref": "#/$defs/policy_entry"
           }
         },
-        "build_targets": {
+        "device_groups": {
           "type": "array",
-          "description": "List of build target definitions for this domain.",
+          "description": "List of device group definitions for this domain.",
           "items": {
-            "$ref": "#/$defs/build_target_entry"
+            "$ref": "#/$defs/device_group_entry"
           }
         }
       }
     },
-    "group_entry": {
+    "policy_entry": {
       "type": "object",
       "required": ["name"],
       "additionalProperties": false,
       "properties": {
         "name": {
           "type": "string",
-          "description": "Unique group identifier. Used as the image name in the build pipeline.",
+          "description": "Unique policy identifier. Used as the image name in the build pipeline.",
           "pattern": "^[a-z][a-z0-9-]*$",
           "minLength": 1
         },
@@ -151,29 +151,29 @@
         }
       }
     },
-    "build_target_entry": {
+    "device_group_entry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "groups", "image_name"],
+      "required": ["name", "policies", "image_name"],
       "properties": {
         "name": {
           "type": "string",
-          "title": "Build Target Name",
+          "title": "Device Group Name",
           "minLength": 1
         },
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "Optional description of the build target",
+          "description": "Optional description of the device group",
           "minLength": 1
         },
-        "groups": {
+        "policies": {
           "type": "array",
-          "title": "Groups",
+          "title": "Policies",
           "minItems": 1,
           "items": {
             "type": "string",
-            "title": "Group Name",
+            "title": "Policy Name",
             "minLength": 1
           },
           "uniqueItems": true
@@ -238,7 +238,7 @@
         },
         "is_default": {
           "type": "boolean",
-          "description": "Marks whether this printer is the default choice. Exactly one printer must be true per group."
+          "description": "Marks whether this printer is the default choice. Exactly one printer must be true per policy."
         }
       }
     },
@@ -286,7 +286,7 @@
         },
         "is_default": {
           "type": "boolean",
-          "description": "Marks whether this printer is the default choice. Exactly one printer must be true per group."
+          "description": "Marks whether this printer is the default choice. Exactly one printer must be true per policy."
         }
       }
     },
@@ -323,7 +323,7 @@
         },
         "is_default": {
           "type": "boolean",
-          "description": "Marks whether this printer is the default choice. Exactly one printer must be true per group."
+          "description": "Marks whether this printer is the default choice. Exactly one printer must be true per policy."
         }
       }
     },

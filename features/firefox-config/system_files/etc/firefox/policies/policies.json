@@ -1,5 +1,7 @@
 {
   "policies": {
+    "RequestedLocales": ["da"],
+    "NoDefaultBookmarks": true,
     "Homepage": {
       "URL": "https://biblioteket.sonderborg.dk",
       "Locked": true,
@@ -73,7 +75,13 @@
       "browser.urlbar.suggest.engines": false,
       "browser.urlbar.quicksuggest.enabled": false,
       "browser.urlbar.suggest.quicksuggest.sponsored": false,
-      "datareporting.policy.dataSubmissionEnabled": false
+      "datareporting.policy.dataSubmissionEnabled": false,
+      "browser.translations.enable": false,
+      "browser.translations.automaticallyPopup": false,
+      "cookiebanners.service.mode": 2,
+      "cookiebanners.service.mode.privateBrowsing": 2,
+      "cookiebanners.bannerClicking.enabled": true,
+      "intl.accept_languages": "da, en-US, en"
     }
   }
 }

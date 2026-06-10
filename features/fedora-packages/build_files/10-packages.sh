@@ -8,6 +8,8 @@ dnf5 install -y \
 	gnome-shell-extension-dash-to-panel \
 	gnome-shell-extension-apps-menu \
 	glibc-langpack-da \
+	firefox \
+	firefox-langpack-da \
 	libreoffice \
     libreoffice-langpack-da \
 	ansible \
@@ -31,5 +33,5 @@ dnf5 install -y \
 # zenity: dialog boxes for shell scripts
 
 # Clean up package manager cache to reduce image size
-dnf clean all
+dnf5 clean all
 rm -rf /var/cache/dnf /var/cache/yum

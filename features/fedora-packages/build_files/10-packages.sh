@@ -19,6 +19,16 @@ dnf5 install -y \
 # Disable COPRs so they do not end up enabled on the final image:
 # dnf5 -y copr disable ublue-os/staging
 
+# Remove unwanted base packages
+dnf5 remove -y \
+	gnome-tour \
+	gnome-software \
+	malcontent-control \
+	yelp \
+
+# this removes welcome-to-gnome, app store, parental controls, and help. 
+# This is to streamline the apps menu.
+
 #list of what each package does respectively:
 
 # gnome-shell-extension-dash-to-panel: windows-like taskbar for gnome

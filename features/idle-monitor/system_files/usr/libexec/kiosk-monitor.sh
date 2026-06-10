@@ -77,7 +77,7 @@ while true; do
                 echo "[+] User confirmed presence. Resetting idle tracker."
             else
                 echo "[-] Timeout reached or dialog closed ($RESPONSE). Executing secure reboot..."
-                /usr/libexec/reboot-handler.sh
+                sudo /usr/local/bin/reset-user.sh
             fi
         fi
     fi

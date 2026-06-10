@@ -26,11 +26,11 @@ enable-auto-login=true
 # control
 [org/gnome/desktop/lockdown]
 disable-command-line=true
-disable-lock-screen=true
+# disable-lock-screen=true
 disable-save-to-disk=true
 disable-show-password=true
-disable-user-switching=true
-disable-log-out=true
+# disable-user-switching=true
+# disable-log-out=true
 user-administration-disabled=true
 
 # notifications
@@ -58,7 +58,7 @@ idle-activation-enabled=false
 lock-enabled=false
 show-full-name-in-top-bar=false
 status-message-enabled=false
-user-switch-enabled=false
+# user-switch-enabled=false
 
 # 0 disables the screen saver/blank screen completely (value is in seconds)
 [org/gnome/desktop/session]

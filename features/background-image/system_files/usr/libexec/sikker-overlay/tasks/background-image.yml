@@ -1,0 +1,26 @@
+---
+- name: Background image override
+  when:
+    - desktop is defined
+    - ((desktop.background_image_file | default('')) | string) | length > 0
+  block:
+    - name: Resolve effective desktop background values
+      ansible.builtin.set_fact:
+        background_image_file: "{{ (desktop.background_image_file | default('')) | string }}"
+        background_image_relpath: "usr/share/backgrounds/sikker-selvbetjening/background-image"
+
+    - name: Resolve desktop background asset path
+      ansible.builtin.set_fact:
+        background_image_asset_relpath: "{{ background_image_file | overlay_asset_relpath }}"
+
+    - name: Ensure background directory exists
+      ansible.builtin.file:
+        path: "{{ output_root }}/usr/share/backgrounds/sikker-selvbetjening"
+        state: directory
+        mode: "0755"
+
+    - name: Override default background with configured asset
+      ansible.builtin.copy:
+        src: "{{ assets_root }}/{{ background_image_asset_relpath }}"
+        dest: "{{ output_root }}/{{ background_image_relpath }}"
+        mode: "0644"

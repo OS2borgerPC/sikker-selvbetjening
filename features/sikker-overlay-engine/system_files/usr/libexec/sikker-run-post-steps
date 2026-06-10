@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Executes post-build steps from a JSON payload using the local Ansible playbook.
+set -euo pipefail
+
+die() {
+  echo "$*" >&2
+  exit 1
+}
+
+POST_STEPS_FILE="${1:?post-steps JSON file required}"
+OVERLAY_PLAYBOOK_ROOT="${SIKKER_OVERLAY_PLAYBOOK_DIR:-/usr/libexec/sikker-overlay}"
+PLAYBOOK_FILE="${OVERLAY_PLAYBOOK_ROOT}/sikker-run-post-steps.yml"
+ANSIBLE_CONFIG_FILE="${OVERLAY_PLAYBOOK_ROOT}/ansible.cfg"
+
+[[ -f "${POST_STEPS_FILE}" ]] || die "Missing post-steps file: ${POST_STEPS_FILE}"
+[[ -d "${OVERLAY_PLAYBOOK_ROOT}" ]] || die "Missing overlay playbook directory: ${OVERLAY_PLAYBOOK_ROOT}"
+[[ -f "${PLAYBOOK_FILE}" ]] || die "Missing post-steps playbook: ${PLAYBOOK_FILE}"
+[[ -f "${ANSIBLE_CONFIG_FILE}" ]] || die "Missing Ansible config: ${ANSIBLE_CONFIG_FILE}"
+command -v ansible-playbook >/dev/null 2>&1 || die "ansible-playbook is not installed"
+
+export ANSIBLE_CONFIG="${ANSIBLE_CONFIG_FILE}"
+export ANSIBLE_NOCOWS=1
+
+ansible-playbook \
+  -i localhost, \
+  -c local \
+  "${PLAYBOOK_FILE}" \
+  --extra-vars "post_steps_file=${POST_STEPS_FILE}"

@@ -1,0 +1,6 @@
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/sikker-selvbetjening/background-image'
+picture-uri-dark='file:///usr/share/backgrounds/sikker-selvbetjening/background-image'
+picture-options='zoom'
+primary-color='#000000'
+secondary-color='#000000'

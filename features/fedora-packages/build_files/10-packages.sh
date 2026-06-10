@@ -31,5 +31,5 @@ dnf5 install -y \
 # zenity: dialog boxes for shell scripts
 
 # Clean up package manager cache to reduce image size
-dnf clean all
+dnf5 clean all
 rm -rf /var/cache/dnf /var/cache/yum

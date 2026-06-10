@@ -8,8 +8,6 @@ dnf5 install -y \
 	gnome-shell-extension-dash-to-panel \
 	gnome-shell-extension-apps-menu \
 	glibc-langpack-da \
-	firefox \
-	firefox-langpack-da \
 	libreoffice \
     libreoffice-langpack-da \
 	ansible \

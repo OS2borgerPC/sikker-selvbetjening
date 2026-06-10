@@ -1,0 +1,79 @@
+{
+  "policies": {
+    "Homepage": {
+      "URL": "https://biblioteket.sonderborg.dk",
+      "Locked": true,
+      "StartPage": "homepage-locked"
+    },
+    "OverrideFirstRunPage": "",
+    "OverridePostUpdatePage": "",
+    "AutofillAddressEnabled": false,
+    "AutofillCreditCardEnabled": false,
+    "DisableFormHistory": true,
+    "OfferToSaveLogins": false,
+    "PasswordManagerEnabled": false,
+    "PrimaryPassword": false,
+    "DisablePasswordReveal": true,
+    "DisableFirefoxAccounts": true,
+    "DisableProfileImport": true,
+    "DisableProfileRefresh": true,
+    "DisableTelemetry": true,
+    "DisableFirefoxStudies": true,
+    "DisablePocket": true,
+    "FirefoxHome": {
+      "Search": true,
+      "TopSites": false,
+      "SponsoredTopSites": false,
+      "Highlights": false,
+      "Pocket": false,
+      "Stories": false,
+      "SponsoredPocket": false,
+      "SponsoredStories": false,
+      "Snippets": false,
+      "Locked": true
+    },
+    "SearchSuggestEnabled": false,
+    "SearchEngines": {
+      "PreventInstalls": true
+    },
+    "ExtensionSettings": {
+      "*": {
+        "installation_mode": "blocked"
+      }
+    },
+    "BlockAboutAddons": true,
+    "BlockAboutConfig": true,
+    "BlockAboutProfiles": true,
+    "BlockAboutSupport": true,
+    "WebsiteFilter": {
+      "Block": [
+        "about:addons",
+        "about:config",
+        "about:profiles",
+        "about:support",
+        "about:debugging",
+        "about:studies",
+        "about:logins"
+      ]
+    },
+    "SanitizeOnShutdown": {
+      "Cache": true,
+      "Cookies": true,
+      "FormData": true,
+      "History": true,
+      "Sessions": true,
+      "SiteSettings": true,
+      "Locked": true
+    },
+    "Preferences": {
+      "browser.sessionstore.resume_from_crash": false,
+      "browser.shell.checkDefaultBrowser": false,
+      "browser.urlbar.suggest.searches": false,
+      "browser.urlbar.suggest.topsites": false,
+      "browser.urlbar.suggest.engines": false,
+      "browser.urlbar.quicksuggest.enabled": false,
+      "browser.urlbar.suggest.quicksuggest.sponsored": false,
+      "datareporting.policy.dataSubmissionEnabled": false
+    }
+  }
+}

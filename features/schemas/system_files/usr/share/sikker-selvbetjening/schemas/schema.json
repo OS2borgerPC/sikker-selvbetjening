@@ -157,7 +157,7 @@
           "properties": {
             "binary_download_command": {
               "type": "string",
-              "description": "Command used to download the MeshAgent binary."
+              "description": "Shell command or direct URL used to obtain the MeshAgent binary."
             }
           }
         }

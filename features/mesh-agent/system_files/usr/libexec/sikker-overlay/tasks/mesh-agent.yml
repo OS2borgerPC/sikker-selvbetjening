@@ -17,8 +17,33 @@
           command: /usr/bin/bash
           args:
             - -lc
-            - "install -d -m 0755 /usr/libexec/meshagent && {{ mesh_agent.binary_download_command }}"
-          cwd: /usr/libexec/meshagent
+            - |
+              set -euo pipefail
+              install -d -m 0755 /usr/libexec/meshagent
+
+              mesh_agent_input="$1"
+
+              # Accept markdown links copied from docs/UI: [label](https://...)
+              if printf '%s' "$mesh_agent_input" | grep -Eq '^\[[^]]+\]\((https?://[^)]+)\)$'; then
+                mesh_agent_input="$(printf '%s' "$mesh_agent_input" | sed -E 's|^\[[^]]+\]\((https?://[^)]+)\)$|\1|')"
+              fi
+
+              if printf '%s' "$mesh_agent_input" | grep -Eq '^https?://'; then
+                if command -v curl >/dev/null 2>&1; then
+                  curl -fL "$mesh_agent_input" -o /usr/libexec/meshagent/meshagent
+                elif command -v wget >/dev/null 2>&1; then
+                  wget -O /usr/libexec/meshagent/meshagent "$mesh_agent_input"
+                else
+                  echo "Neither curl nor wget is available for MeshAgent download" >&2
+                  exit 1
+                fi
+              else
+                eval "$mesh_agent_input"
+              fi
+
+              chmod 0755 /usr/libexec/meshagent/meshagent || true
+            - --
+            - "{{ mesh_agent.binary_download_command }}"
 
     - name: Add Mesh Agent install step when missing
       ansible.builtin.set_fact:

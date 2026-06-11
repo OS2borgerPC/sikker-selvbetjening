@@ -1,27 +1,30 @@
 #!/bin/sh
 
-TARGET_USER="Bruger"
-PASSWORDLESS_GROUP="nopasswdlogin"
+# This script only resets user on logout.
+# there is an extra script on boot for this, 
+# incase of power loss or other unexpected shutdowns.
+# located in create-guest.sh in the create-users feature.
 
-if [ "$USER" = "$TARGET_USER" ]; then
+# 1. Load global guest configuration
+if [ -f /etc/guest-user.conf ]; then 
+    . /etc/guest-user.conf 
+else 
+    GUEST_USER="Bruger" 
+fi
 
-    # 1. Forcefully kill any lingering background processes
-    pkill -KILL -u "$TARGET_USER" || true
+# 2. Check if the logged-out user is our configured guest
+if [ "$USER" = "$GUEST_USER" ]; then
+    echo "[!] Active user session logout: Purging $GUEST_USER..."
+    
+    pkill -KILL -u "$GUEST_USER" || true
     sleep 1
+    userdel -r "$GUEST_USER" || true
+    rm -rf "/home/$GUEST_USER"
 
-    # 2. Delete the user and completely wipe data
-    userdel -r "$TARGET_USER" || true
-    rm -rf "/home/$TARGET_USER"
-
-    # 3. Ensure the passwordless group exists
-    if ! getent group "$PASSWORDLESS_GROUP" >/dev/null; then
-        groupadd -r "$PASSWORDLESS_GROUP"
-    fi
-
-    # 4. Recreate a fresh kiosk account assigned to the passwordless group
-    useradd -m -s /bin/bash -G "$PASSWORDLESS_GROUP" "$TARGET_USER"
-    passwd -d "$TARGET_USER"
-
+    # 3. Spawn a pristine profile for the next guest
+    getent group nopasswdlogin >/dev/null || groupadd -r nopasswdlogin
+    useradd -m -s /bin/bash -G "nopasswdlogin" "$GUEST_USER"
+    passwd -d "$GUEST_USER"
 fi
 
 exit 0

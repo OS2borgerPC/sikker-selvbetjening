@@ -1,0 +1,12 @@
+[Unit]
+Description=Wipe and Recreate Guest User on Boot
+After=systemd-userdbd.service
+Before=gdm.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/create-guest.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

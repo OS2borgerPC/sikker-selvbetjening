@@ -28,3 +28,5 @@ if [ "$USER" = "$GUEST_USER" ]; then
 fi
 
 exit 0
+
+#test

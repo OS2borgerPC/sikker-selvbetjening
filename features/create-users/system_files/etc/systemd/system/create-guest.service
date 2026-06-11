@@ -5,7 +5,7 @@ Before=gdm.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/create-guest.sh
+ExecStart=/etc/gdm/PostSession/Default
 RemainAfterExit=yes
 
 [Install]

@@ -1,32 +1,37 @@
-#!/bin/sh
+#!/bin/bash
+set -euo pipefail
 
 # This script only resets user on logout.
 # there is an extra script on boot for this, 
 # incase of power loss or other unexpected shutdowns.
 # located in create-guest.sh in the create-users feature.
 
-# 1. Load global guest configuration
-if [ -f /etc/guest-user.conf ]; then 
-    . /etc/guest-user.conf 
-else 
-    GUEST_USER="Bruger" 
-fi
+TARGET_USER="Bruger"
 
-# 2. Check if the logged-out user is our configured guest
-if [ "$USER" = "$GUEST_USER" ]; then
-    echo "[!] Active user session logout: Purging $GUEST_USER..."
+echo "[!] Executing guest session reset for user: $TARGET_USER"
+
+# Check if the user exists before trying to kill processes or delete files
+if id "$TARGET_USER" >/dev/null 2>&1; then
+    echo "[~] $TARGET_USER exists. Cleaning up active session..."
     
-    pkill -KILL -u "$GUEST_USER" || true
-    sleep 1
-    userdel -r "$GUEST_USER" || true
-    rm -rf "/home/$GUEST_USER"
+    # 1. Forcefully terminate any lingering processes belonging to the user
+    pkill -KILL -u "$TARGET_USER" || true
+    sleep 0.5
 
-    # 3. Spawn a pristine profile for the next guest
-    getent group nopasswdlogin >/dev/null || groupadd -r nopasswdlogin
-    useradd -m -s /bin/bash -G "nopasswdlogin" "$GUEST_USER"
-    passwd -d "$GUEST_USER"
+    # 2. Completely remove the user and their home directory
+    userdel -r "$TARGET_USER" || true
+    rm -rf "/home/$TARGET_USER"
+else
+    echo "[+] $TARGET_USER does not exist yet (First Boot). Skipping cleanup phase."
 fi
 
-exit 0
+# 3. Ensure the passwordless login group exists
+getent group nopasswdlogin >/dev/null || groupadd -r nopasswdlogin
 
+# 4. Create the user cleanly (works for both first-boot and recreation loops)
+useradd -m -s /usr/sbin/nologin -p "" -G "nopasswdlogin" "$TARGET_USER"
+passwd -d "$TARGET_USER"
+
+echo "[+] $TARGET_USER has been successfully initialized to a pristine state."
+exit 0
 #test

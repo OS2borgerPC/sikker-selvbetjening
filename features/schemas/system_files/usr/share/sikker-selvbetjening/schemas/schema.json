@@ -148,6 +148,18 @@
               "minItems": 1
             }
           }
+        },
+        "mesh_agent": {
+          "title": "Mesh Agent",
+          "description": "MeshCentral Mesh Agent configuration section.",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "binary_download_command": {
+              "type": "string",
+              "description": "Command used to download the MeshAgent binary."
+            }
+          }
         }
       }
     },

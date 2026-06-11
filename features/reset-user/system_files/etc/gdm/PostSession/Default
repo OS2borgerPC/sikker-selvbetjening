@@ -1,9 +1,8 @@
 #!/bin/sh
 
 TARGET_USER="Bruger"
+PASSWORDLESS_GROUP="nopasswdlogin"
 
-# Check if the user who just logged out is our target user
-# GDM passes the username as the $USER variable to this script
 if [ "$USER" = "$TARGET_USER" ]; then
 
     # 1. Forcefully kill any lingering background processes
@@ -14,12 +13,15 @@ if [ "$USER" = "$TARGET_USER" ]; then
     userdel -r "$TARGET_USER" || true
     rm -rf "/home/$TARGET_USER"
 
-    # 3. Recreate a fresh kiosk account
-    useradd -m -s /bin/bash "$TARGET_USER"
-    passwd -d "$TARGET_USER" # Clear password so autologin doesn't prompt
+    # 3. Ensure the passwordless group exists
+    if ! getent group "$PASSWORDLESS_GROUP" >/dev/null; then
+        groupadd -r "$PASSWORDLESS_GROUP"
+    fi
 
-    # 4. GDM will automatically cycle back to the login screen,
-    # triggering your custom.conf autologin. No need to restart the service!
+    # 4. Recreate a fresh kiosk account assigned to the passwordless group
+    useradd -m -s /bin/bash -G "$PASSWORDLESS_GROUP" "$TARGET_USER"
+    passwd -d "$TARGET_USER"
+
 fi
 
 exit 0

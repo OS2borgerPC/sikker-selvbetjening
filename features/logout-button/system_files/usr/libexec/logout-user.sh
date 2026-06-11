@@ -22,7 +22,7 @@ RESPONSE=$?
 
 if [ "$RESPONSE" -eq 0 ]; then
     echo "[!] User confirmed logout. Executing secure reboot without authentication..."
-    sudo /usr/local/bin/reset-user.sh
+    gnome-session-quit --logout --no-prompt
 else
     echo "[~] Logout canceled by user. Returning to session."
     exit 0

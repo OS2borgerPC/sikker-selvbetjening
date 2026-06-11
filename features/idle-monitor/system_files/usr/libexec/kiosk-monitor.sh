@@ -77,7 +77,7 @@ while true; do
                 echo "[+] User confirmed presence. Resetting idle tracker."
             else
                 echo "[-] Timeout reached or dialog closed ($RESPONSE). Executing secure reboot..."
-                sudo /usr/local/bin/reset-user.sh
+                gnome-session-quit --logout --no-prompt
             fi
         fi
     fi

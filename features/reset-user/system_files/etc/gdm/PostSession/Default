@@ -1,0 +1,25 @@
+#!/bin/sh
+
+TARGET_USER="Bruger"
+
+# Check if the user who just logged out is our target user
+# GDM passes the username as the $USER variable to this script
+if [ "$USER" = "$TARGET_USER" ]; then
+
+    # 1. Forcefully kill any lingering background processes
+    pkill -KILL -u "$TARGET_USER" || true
+    sleep 1
+
+    # 2. Delete the user and completely wipe data
+    userdel -r "$TARGET_USER" || true
+    rm -rf "/home/$TARGET_USER"
+
+    # 3. Recreate a fresh kiosk account
+    useradd -m -s /bin/bash "$TARGET_USER"
+    passwd -d "$TARGET_USER" # Clear password so autologin doesn't prompt
+
+    # 4. GDM will automatically cycle back to the login screen,
+    # triggering your custom.conf autologin. No need to restart the service!
+fi
+
+exit 0

@@ -33,5 +33,6 @@ useradd -m -s /usr/sbin/nologin -p "" -G "nopasswdlogin" "$TARGET_USER"
 passwd -d "$TARGET_USER"
 
 echo "[+] $TARGET_USER has been successfully initialized to a pristine state."
+
+systemctl restart gdm
 exit 0
-#test

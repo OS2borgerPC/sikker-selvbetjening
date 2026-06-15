@@ -155,9 +155,9 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "binary_download_command": {
+            "agent_download_command": {
               "type": "string",
-              "description": "Shell command or direct URL used to obtain the MeshAgent binary."
+              "description": "The download command of the New devices group"
             }
           }
         }

@@ -155,9 +155,10 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "agent_download_command": {
+            "agent_download_script_file": {
               "type": "string",
-              "description": "The download command of the New devices group"
+              "pattern": "^config/assets/[a-z][a-z0-9_-]*/.+",
+              "description": "Asset path to a Mesh Agent download script. Values starting with config/assets/ are treated as file paths under config/assets."
             }
           }
         }

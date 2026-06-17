@@ -3,7 +3,7 @@
 Filen:
 
 ```
-system_files/etc/dconf/db/local.d/favorite_apps
+system_files/etc/dconf/db/local.d/favorite-apps
 ```
 
 definerer hvilke programmer der bliver fastgjort til GNOME’s (brugergrænsefladen) proceslinje (Dash / taskbar).
@@ -16,18 +16,18 @@ Som standard indeholder filen følgende konfiguration:
 
 ```ini
 [org/gnome/shell]
-favorite_apps=[
+favorite-apps=[
   'org.gnome.Nautilus.desktop','org.mozilla.firefox.desktop','libreoffice-writer.desktop','logout-button.desktop'
 ]
 ```
 
-Denne indstilling styrer GNOME’s `favorite_apps`, som bestemmer hvilke programmer der vises som fastgjorte ikoner i brugerfladen.
+Denne indstilling styrer GNOME’s `favorite-apps`, som bestemmer hvilke programmer der vises som fastgjorte ikoner i brugerfladen.
 
 GNOME er det grafiske skrivebordsmiljø (user interface), som brugeren interagerer med.
 
 ---
 
-## Sådan ændrer du favorite_apps
+## Sådan ændrer du favorite-apps
 
 Hvis du vil tilføje eller fjerne programmer fra listen, skal du følge disse trin:
 
@@ -69,12 +69,12 @@ config/config.yml
 
 ---
 
-### 2. Find eller opret `favorite_apps` sektionen
+### 2. Find eller opret `favorite-apps` sektionen
 
 Under `policies:` skal du finde (eller oprette):
 
 ```yaml
-favorite_apps:
+favorite-apps:
 ```
 
 Hvis den ikke findes, kan du selv tilføje den.
@@ -83,7 +83,7 @@ Hvis den ikke findes, kan du selv tilføje den.
 
 ### 3. Tilføj apps
 
-Inde i `favorite_apps` tilføjes en liste under `apps:`.
+Inde i `favorite-apps` tilføjes en liste under `apps:`.
 
 Hver app skal stå på sin egen linje med en bindestreg (`-`).
 
@@ -92,7 +92,7 @@ Hver app skal stå på sin egen linje med en bindestreg (`-`).
 ### Eksempel
 
 ```yaml
-favorite_apps:
+favorite-apps:
   apps:
     - org.gnome.Nautilus.desktop
     - org.mozilla.firefox.desktop
@@ -117,4 +117,4 @@ Inden du gemmer:
 * Indrykning i YAML er kritisk
 * Forkerte `.desktop`-navne vil resultere i manglende apps
 * Ændringer træder først i kraft efter ny system-build
-* `/etc/dconf/db/local.d/locks/favorite_apps` låser ned for brugerens input, så de ikke kan ændre hvad er fastgjort. det bør ikke røres ved, men kan slettes, hvis du ønsker at give brugeren evnen til at fastgøre og frigør apps selv.
+* `/etc/dconf/db/local.d/locks/favorite-apps` låser ned for brugerens input, så de ikke kan ændre hvad er fastgjort. det bør ikke røres ved, men kan slettes, hvis du ønsker at give brugeren evnen til at fastgøre og frigør apps selv.

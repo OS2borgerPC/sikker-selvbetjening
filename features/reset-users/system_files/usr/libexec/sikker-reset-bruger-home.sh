@@ -11,6 +11,9 @@ echo "Resetting user: $USERNAME"
 if id "$USERNAME" &>/dev/null; then
     loginctl terminate-user "$USERNAME" || true
     pkill -u "$USERNAME" || true
+    
+    # Give systemd a brief moment to clear the user session bus
+    sleep 1
 
     # Remove user and home directory
     userdel -r "$USERNAME" || true
@@ -32,3 +35,7 @@ if command -v restorecon &>/dev/null; then
 fi
 
 echo "User $USERNAME recreated successfully."
+
+# Force GDM to restart and trigger autologin for the fresh user
+echo "Restarting GNOME Display Manager..."
+systemctl restart gdm

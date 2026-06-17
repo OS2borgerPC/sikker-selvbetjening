@@ -30,3 +30,7 @@ if [ "$CURRENT_HOSTNAME" != "$FINAL_STRING" ]; then
 else
     echo "Hostname is already up to date ('$CURRENT_HOSTNAME'). No action taken."
 fi
+
+# 🔑 Stamp the filesystem so the systemd service skips all future boots
+touch /etc/.hostname-initialized
+echo "First-boot initialization flag created."

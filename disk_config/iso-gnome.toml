@@ -5,23 +5,34 @@ contents = """
 # Accept the EULA automatically
 eula --agreed
 
-# Partition strategy: use LVM and automatic partitioning (entire disk)
-autopart --type=lvm --fstype=ext4
+# Don't prompt for partitioning
+zerombr
 
-# Accept the default storage configuration without prompts
-ignoredisk --only-use=sda,sdb,nvme*
+# Clear all partitions
+clearpart --all --initlabel
+
+# 🔑 EXPLICIT DYNAMIC LVM PARTITIONING (30/70 SPLIT)
+# Create the standard physical partitions needed for UEFI booting
+part /boot/efi --fstype=vfat --size=600
+part /boot --fstype=ext4 --size=1024
+
+# Create the Physical Volume spanning the rest of the disk
+part pv.01 --size=1 --grow
+
+# Define the Volume Group
+volgroup fedora pv.01
+
+# Dynamically allocate 30% of the VG to the Root (/) logical volume for the OS layers
+logvol / --vgname=fedora --percent=30 --grow --name=root --fstype=ext4
+
+# Dynamically allocate the remaining 70% to /var for runtime data and user homes
+logvol /var --vgname=fedora --percent=70 --grow --name=var --fstype=ext4
 
 # Network - use DHCP
 network --bootproto=dhcp --onboot=on --activate
 
 # Root password (set to a strong password or use --lock to disable root login)
 rootpw --lock
-
-# Don't prompt for partitioning
-zerombr
-
-# Clear all partitions
-clearpart --all --initlabel
 
 # Skip initial setup on first boot
 firstboot --disable

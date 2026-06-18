@@ -1,4 +1,4 @@
-This document is an addendum to [./ci_pipeline_design.md]. It describes how we combine components to create a minimally acceptable prototype of this project.
+This document is an addendum to [./image_build_design.md]. It describes how we combine components to create a minimally acceptable prototype of this project.
 
 The components used in the prototype presentation should follow this flow:
 

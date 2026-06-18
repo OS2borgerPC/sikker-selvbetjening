@@ -14,7 +14,7 @@ Throughout the following document, we use this ubiquitous language:
 
 # Prototype Build Flow
 
-The prototype build flow is explained in a separate document [./ci_pipeline_prototype.md].
+The prototype build flow is explained in a separate document [./image_build_prototype.md].
 
 This flow is a subset of an envisioned build flow covers more production needs, and to explain the decisions that underlie this prototype flow, we present them in the context of such a more complete flow.
 

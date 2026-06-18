@@ -180,11 +180,11 @@ Design Notes regarding the Disk Image Store:
 
 ### Note 9
 
-Why is the Pipeline Declaration a separate component outside of the Local Administration, and why is it in OS2basis?
+Why is the Pipeline Declaration a separate component outside of the Local Context?
 
 - The Local Context does not own any pipeline logic. This is because (1) the functionality of the pipeline should be independent of the Local Configuration the Local Context maintains, and (2) they should not need to modify the pipeline.
 
-Why is the Pipeline Declaration owned by OS2basis?
+Why is the Pipeline Declaration owned by the Base Context (OS2basis)?
 
 - It is up for debate whether this should be part of the Base Context, the Domain Context, or entirely separate.
 - There is little need for customization of the pipeline declaration on a domain level: How to build an OS image should mostly be uniform across OS2basis projects.

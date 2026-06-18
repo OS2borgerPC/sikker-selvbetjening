@@ -191,6 +191,7 @@ Why is the Pipeline Declaration owned by the Base Context (OS2basis)?
 - Risk: The scope of OS2basis project is still unclear at the moment, and this makes it challenging to say how different build processes actually would be between the different contexts.
 
 Design Notes:
+- The Pipeline Declaration should be written in a format that can easily be transferred between CI Pipeline systems (Interoperability). There is little to gain from using modules that are specific to one CI system, whereas using such modules opens up various supply chain challenges.
 - Open Question: How do we ensure that the Pipeline Declaration is authentic? Forging a Pipeline Declaration would break any other security guarantees during the build process.
 
 ### Note 10

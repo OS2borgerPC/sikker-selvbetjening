@@ -38,9 +38,9 @@ flowchart TB
     ClientPC -- "(~) checks for signed & updated Image Build in " --> ImageRegistry
 ```
 
-Design decisions and language related to the envisioned production pipeline can be found in the [./ci_pipeline_design.md] document.
+Design decisions and language related to the envisioned production pipeline can be found in the [./image_build_design.md] document.
 
-The following notes explain why decisions where made where the prototype deviates from the Envisioned Build Flow in [./ci_pipeline_design.md].
+The following notes explain why decisions where made where the prototype deviates from the Envisioned Build Flow in the aforementioned document.
 
 ### Note 1
 

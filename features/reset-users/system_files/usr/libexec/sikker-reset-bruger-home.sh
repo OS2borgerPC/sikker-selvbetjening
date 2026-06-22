@@ -35,7 +35,3 @@ if command -v restorecon &>/dev/null; then
 fi
 
 echo "User $USERNAME recreated successfully."
-
-# Force GDM to restart and trigger autologin for the fresh user
-echo "Restarting GNOME Display Manager..."
-systemctl restart gdm

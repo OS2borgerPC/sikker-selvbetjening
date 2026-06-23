@@ -9,9 +9,21 @@
     mesh_agent_enabled: "{{ (mesh_agent_url | length > 0) and (mesh_agent_groupid | length > 0) }}"
     mesh_agent_url_normalized: "{{ mesh_agent_url | regex_replace('/+$', '') }}"
 
+- name: Debug mesh agent configuration resolution
+  ansible.builtin.debug:
+    msg:
+      - "mesh_agent_enabled={{ mesh_agent_enabled | bool }}"
+      - "mesh_agent_url_normalized={{ mesh_agent_url_normalized }}"
+      - "mesh_agent_groupid_length={{ mesh_agent_groupid | length }}"
+      - "output_root={{ output_root }}"
+
 - name: Ensure MeshCentral agent is installed and started on boot
   when: mesh_agent_enabled | bool
   block:
+    - name: Debug entering mesh agent enabled branch
+      ansible.builtin.debug:
+        msg: "Mesh agent is enabled. Staging service and bootstrap artifacts."
+
     - name: Ensure mesh agent script directory exists in staged root
       ansible.builtin.file:
         path: "{{ output_root }}/usr/libexec"
@@ -88,6 +100,24 @@
         dest: "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
         state: link
 
+    - name: Collect mesh agent staged artifact stats
+      ansible.builtin.stat:
+        path: "{{ mesh_agent_staged_artifact }}"
+      loop:
+        - "{{ output_root }}/usr/libexec/meshagent-bootstrap.sh"
+        - "{{ output_root }}/etc/systemd/system/meshagent.service"
+        - "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
+      loop_control:
+        loop_var: mesh_agent_staged_artifact
+      register: mesh_agent_staged_stats
+
+    - name: Debug mesh agent staged artifact stats
+      ansible.builtin.debug:
+        msg: "path={{ item.stat.path }} exists={{ item.stat.exists }} islnk={{ item.stat.islnk | default(false) }} mode={{ item.stat.mode | default('n/a') }} size={{ item.stat.size | default('n/a') }}"
+      loop: "{{ mesh_agent_staged_stats.results }}"
+      loop_control:
+        label: "{{ item.stat.path }}"
+
     - name: Read post-steps configuration
       ansible.builtin.slurp:
         path: "{{ output_root }}/post-steps.json"
@@ -103,6 +133,10 @@
             - -lc
             - rm -f /etc/systemd/system/multi-user.target.wants/meshagent.service /etc/systemd/system/meshagent.service /usr/libexec/meshagent-bootstrap.sh || true; systemctl daemon-reload || true; systemctl disable --now meshagent.service || true; rm -rf /opt/meshagent
 
+    - name: Debug post-steps before cleanup removal for enabled mesh agent
+      ansible.builtin.debug:
+        msg: "post_steps_count_before={{ (post_steps_doc.steps | default([])) | length }}"
+
     - name: Remove mesh agent cleanup step when mesh agent is enabled
       ansible.builtin.set_fact:
         post_steps_doc: "{{ post_steps_doc | combine({'steps': (post_steps_doc.steps | default([]) | reject('equalto', mesh_agent_cleanup_step) | list)}, recursive=True) }}"
@@ -113,9 +147,17 @@
         mode: "0644"
         content: "{{ post_steps_doc | to_nice_json }}\n"
 
+    - name: Debug post-steps after cleanup removal for enabled mesh agent
+      ansible.builtin.debug:
+        msg: "post_steps_count_after={{ (post_steps_doc.steps | default([])) | length }}"
+
 - name: Remove MeshCentral agent artifacts when config is not set
   when: not (mesh_agent_enabled | bool)
   block:
+    - name: Debug entering mesh agent disabled branch
+      ansible.builtin.debug:
+        msg: "Mesh agent is disabled. Removing staged artifacts and ensuring cleanup post-step exists."
+
     - name: Remove mesh agent service from staged root
       ansible.builtin.file:
         path: "{{ mesh_agent_artifact }}"
@@ -142,6 +184,10 @@
             - -lc
             - rm -f /etc/systemd/system/multi-user.target.wants/meshagent.service /etc/systemd/system/meshagent.service /usr/libexec/meshagent-bootstrap.sh || true; systemctl daemon-reload || true; systemctl disable --now meshagent.service || true; rm -rf /opt/meshagent
 
+    - name: Debug post-steps before cleanup add for disabled mesh agent
+      ansible.builtin.debug:
+        msg: "post_steps_count_before={{ (post_steps_doc.steps | default([])) | length }}"
+
     - name: Add mesh agent cleanup step when missing
       ansible.builtin.set_fact:
         post_steps_doc: "{{ post_steps_doc | combine({'steps': (post_steps_doc.steps | default([])) + [mesh_agent_cleanup_step]}, recursive=True) }}"
@@ -152,3 +198,7 @@
         dest: "{{ output_root }}/post-steps.json"
         mode: "0644"
         content: "{{ post_steps_doc | to_nice_json }}\n"
+
+    - name: Debug post-steps after cleanup add for disabled mesh agent
+      ansible.builtin.debug:
+        msg: "post_steps_count_after={{ (post_steps_doc.steps | default([])) | length }}"

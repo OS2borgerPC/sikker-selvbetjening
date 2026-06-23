@@ -20,8 +20,8 @@ while true; do
         --object-path /org/gnome/Mutter/IdleMonitor/Core \
         --method org.gnome.Mutter.IdleMonitor.GetIdletime)
 
-    idle_ms=$(echo "$raw_idle" | grep -o '[0-9]\+')
-
+    idle_ms=$(echo "$raw_idle" | grep -oE '[0-9]+' | head -n1)
+    
     # Validate
     [[ "$idle_ms" =~ ^[0-9]+$ ]] || { sleep 2; continue; }
 

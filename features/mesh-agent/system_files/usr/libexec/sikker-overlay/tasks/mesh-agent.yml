@@ -1,0 +1,150 @@
+---
+- name: Configure MeshCentral agent runtime bootstrap
+  ansible.builtin.set_fact:
+    mesh_agent_url: "{{ ((mesh_agent | default({})).url | default('')) | string | trim }}"
+    mesh_agent_groupid: "{{ ((mesh_agent | default({})).groupid | default('')) | string | trim }}"
+
+- name: Resolve MeshCentral agent toggle
+  ansible.builtin.set_fact:
+    mesh_agent_enabled: "{{ (mesh_agent_url | length > 0) and (mesh_agent_groupid | length > 0) }}"
+    mesh_agent_url_normalized: "{{ mesh_agent_url | regex_replace('/+$', '') }}"
+
+- name: Ensure MeshCentral agent is installed and started on boot
+  when: mesh_agent_enabled | bool
+  block:
+    - name: Ensure mesh agent script directory exists in staged root
+      ansible.builtin.file:
+        path: "{{ output_root }}/usr/libexec"
+        state: directory
+        mode: "0755"
+
+    - name: Ensure systemd directories exist in staged root
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        mode: "{{ item.mode }}"
+      loop:
+        - path: "{{ output_root }}/etc/systemd/system"
+          mode: "0755"
+        - path: "{{ output_root }}/etc/systemd/system/multi-user.target.wants"
+          mode: "0755"
+
+    - name: Write mesh agent bootstrap script
+      ansible.builtin.copy:
+        dest: "{{ output_root }}/usr/libexec/meshagent-bootstrap.sh"
+        mode: "0755"
+        content: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          AGENT_DIR="/opt/meshagent"
+          AGENT_BIN="${AGENT_DIR}/meshagent"
+          AGENT_MSH="${AGENT_DIR}/meshagent.msh"
+          AGENT_GROUP_MARKER="${AGENT_DIR}/.groupid"
+          BASE_URL="{{ mesh_agent_url_normalized }}"
+          GROUP_ID="{{ mesh_agent_groupid }}"
+          AGENT_ID="6"
+
+          mkdir -p "${AGENT_DIR}"
+
+          if [[ ! -x "${AGENT_BIN}" ]]; then
+            curl -fsSL "${BASE_URL}/meshagents?id=${AGENT_ID}" -o "${AGENT_BIN}"
+            chmod +x "${AGENT_BIN}"
+          fi
+
+          if [[ ! -f "${AGENT_GROUP_MARKER}" ]] || [[ "$(cat "${AGENT_GROUP_MARKER}")" != "${GROUP_ID}" ]]; then
+            curl -fsSL "${BASE_URL}/meshsettings?id=${GROUP_ID}" -o "${AGENT_MSH}"
+            printf '%s' "${GROUP_ID}" > "${AGENT_GROUP_MARKER}"
+          elif [[ ! -s "${AGENT_MSH}" ]]; then
+            curl -fsSL "${BASE_URL}/meshsettings?id=${GROUP_ID}" -o "${AGENT_MSH}"
+          fi
+
+    - name: Write mesh agent systemd service
+      ansible.builtin.copy:
+        dest: "{{ output_root }}/etc/systemd/system/meshagent.service"
+        mode: "0644"
+        content: |
+          [Unit]
+          Description=MeshCentral Agent
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=simple
+          WorkingDirectory=/opt/meshagent
+          ExecStartPre=/usr/libexec/meshagent-bootstrap.sh
+          ExecStart=/opt/meshagent/meshagent
+          Restart=always
+          RestartSec=10
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Enable mesh agent service in staged root
+      ansible.builtin.file:
+        src: /etc/systemd/system/meshagent.service
+        dest: "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
+        state: link
+
+    - name: Read post-steps configuration
+      ansible.builtin.slurp:
+        path: "{{ output_root }}/post-steps.json"
+      register: post_steps_raw
+
+    - name: Parse post-steps configuration
+      ansible.builtin.set_fact:
+        post_steps_doc: "{{ post_steps_raw.content | b64decode | from_json }}"
+        mesh_agent_cleanup_step:
+          action: run
+          command: bash
+          args:
+            - -lc
+            - rm -f /etc/systemd/system/multi-user.target.wants/meshagent.service /etc/systemd/system/meshagent.service /usr/libexec/meshagent-bootstrap.sh || true; systemctl daemon-reload || true; systemctl disable --now meshagent.service || true; rm -rf /opt/meshagent
+
+    - name: Remove mesh agent cleanup step when mesh agent is enabled
+      ansible.builtin.set_fact:
+        post_steps_doc: "{{ post_steps_doc | combine({'steps': (post_steps_doc.steps | default([]) | reject('equalto', mesh_agent_cleanup_step) | list)}, recursive=True) }}"
+
+    - name: Write post-steps configuration
+      ansible.builtin.copy:
+        dest: "{{ output_root }}/post-steps.json"
+        mode: "0644"
+        content: "{{ post_steps_doc | to_nice_json }}\n"
+
+- name: Remove MeshCentral agent artifacts when config is not set
+  when: not (mesh_agent_enabled | bool)
+  block:
+    - name: Remove mesh agent service from staged root
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
+        - "{{ output_root }}/etc/systemd/system/meshagent.service"
+        - "{{ output_root }}/usr/libexec/meshagent-bootstrap.sh"
+
+    - name: Read post-steps configuration
+      ansible.builtin.slurp:
+        path: "{{ output_root }}/post-steps.json"
+      register: post_steps_raw
+
+    - name: Parse post-steps configuration
+      ansible.builtin.set_fact:
+        post_steps_doc: "{{ post_steps_raw.content | b64decode | from_json }}"
+        mesh_agent_cleanup_step:
+          action: run
+          command: bash
+          args:
+            - -lc
+            - rm -f /etc/systemd/system/multi-user.target.wants/meshagent.service /etc/systemd/system/meshagent.service /usr/libexec/meshagent-bootstrap.sh || true; systemctl daemon-reload || true; systemctl disable --now meshagent.service || true; rm -rf /opt/meshagent
+
+    - name: Add mesh agent cleanup step when missing
+      ansible.builtin.set_fact:
+        post_steps_doc: "{{ post_steps_doc | combine({'steps': (post_steps_doc.steps | default([])) + [mesh_agent_cleanup_step]}, recursive=True) }}"
+      when: mesh_agent_cleanup_step not in (post_steps_doc.steps | default([]))
+
+    - name: Write post-steps configuration
+      ansible.builtin.copy:
+        dest: "{{ output_root }}/post-steps.json"
+        mode: "0644"
+        content: "{{ post_steps_doc | to_nice_json }}\n"

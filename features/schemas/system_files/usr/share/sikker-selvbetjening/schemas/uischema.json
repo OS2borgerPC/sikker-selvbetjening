@@ -10,13 +10,8 @@
       }
     },
     "mesh_agent": {
-      "agent_download_script_file": {
-        "ui:widget": "file",
-        "ui:options": {
-          "accept": ".sh,text/x-shellscript,text/plain",
-          "assetPrefixTemplate": "config/assets/{domain}/"
-        }
-      }
+      "url": {},
+      "groupid": {}
     }
   }
 }

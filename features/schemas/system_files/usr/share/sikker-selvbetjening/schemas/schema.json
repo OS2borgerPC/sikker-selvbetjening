@@ -155,10 +155,15 @@
           "type": "object",
           "additionalProperties": false,
           "properties": {
-            "agent_download_script_file": {
+            "url": {
               "type": "string",
-              "pattern": "^config/assets/[a-z][a-z0-9_-]*/.+",
-              "description": "Asset path to a Mesh Agent download script. Values starting with config/assets/ are treated as file paths under config/assets."
+              "format": "uri",
+              "description": "MeshCentral agent download URL."
+            },
+            "groupid": {
+              "type": "string",
+              "minLength": 1,
+              "description": "MeshCentral group identifier to enroll the device in."
             }
           }
         }

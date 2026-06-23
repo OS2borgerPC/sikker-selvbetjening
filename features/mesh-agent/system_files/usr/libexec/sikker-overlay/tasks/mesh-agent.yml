@@ -20,14 +20,16 @@
 
     - name: Ensure systemd directories exist in staged root
       ansible.builtin.file:
-        path: "{{ item.path }}"
+        path: "{{ systemd_dir.path }}"
         state: directory
-        mode: "{{ item.mode }}"
+        mode: "{{ systemd_dir.mode }}"
       loop:
         - path: "{{ output_root }}/etc/systemd/system"
           mode: "0755"
         - path: "{{ output_root }}/etc/systemd/system/multi-user.target.wants"
           mode: "0755"
+      loop_control:
+        loop_var: systemd_dir
 
     - name: Write mesh agent bootstrap script
       ansible.builtin.copy:
@@ -82,7 +84,7 @@
 
     - name: Enable mesh agent service in staged root
       ansible.builtin.file:
-        src: /etc/systemd/system/meshagent.service
+        src: ../meshagent.service
         dest: "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
         state: link
 
@@ -116,12 +118,14 @@
   block:
     - name: Remove mesh agent service from staged root
       ansible.builtin.file:
-        path: "{{ item }}"
+        path: "{{ mesh_agent_artifact }}"
         state: absent
       loop:
         - "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
         - "{{ output_root }}/etc/systemd/system/meshagent.service"
         - "{{ output_root }}/usr/libexec/meshagent-bootstrap.sh"
+      loop_control:
+        loop_var: mesh_agent_artifact
 
     - name: Read post-steps configuration
       ansible.builtin.slurp:

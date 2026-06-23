@@ -1,0 +1,14 @@
+[Unit]
+Description=Kiosk recovery reset on boot
+After=local-fs.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/kiosk-reset.sh
+
+# Run very early, before login screen is used
+DefaultDependencies=no
+Before=display-manager.service
+
+[Install]
+WantedBy=multi-user.target

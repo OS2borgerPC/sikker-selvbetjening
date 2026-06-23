@@ -23,14 +23,14 @@ enable-smartcard-authentication=false
 enable-password-authentication=false
 enable-auto-login=true
 
-# control
+# lockdown
 [org/gnome/desktop/lockdown]
 disable-command-line=true
 disable-lock-screen=true
 disable-save-to-disk=true
 disable-show-password=true
 disable-user-switching=true
-disable-log-out=true
+disable-log-out=false
 user-administration-disabled=true
 
 # notifications
@@ -38,7 +38,7 @@ user-administration-disabled=true
 show-banners=false
 show-in-lock-screen=false
 
-# numlock (initial state, can still be toggled normally)
+# keyboard
 [org/gnome/desktop/peripherals/keyboard]
 numlock-state=true
 
@@ -46,24 +46,22 @@ numlock-state=true
 [org/gnome/desktop/privacy]
 remember-app-usage=false
 report-technical-problems=false
-show-full-name-in-top-bar=false
 
 # workspaces
 [org/gnome/mutter]
 dynamic-workspaces=false
 
-# AFK
+# screensaver / idle
 [org/gnome/desktop/screensaver]
 idle-activation-enabled=false
 lock-enabled=false
-show-full-name-in-top-bar=false
 status-message-enabled=false
 user-switch-enabled=false
 
-# 0 disables the screen saver/blank screen completely (value is in seconds)
 [org/gnome/desktop/session]
 idle-delay=uint32 0
 
+# power (disable sleep)
 [org/gnome/settings-daemon/plugins/power]
 sleep-inactive-ac-type='nothing'
 sleep-inactive-battery-type='nothing'

@@ -24,22 +24,28 @@ else
 fi
 
 
-echo "[4/4] Generating language-aware XDG home directory..."
-# Recreate a completely empty home directory
+echo "[4/4] Generating language-aware XDG home directory with system skeleton..."
+# 1. Recreate a completely empty home directory base
 mkdir -p "$HOME_DIR"
 
-# 1. Read the actual system language configured in the OS
+# 2. Copy the system skeleton files (.bashrc, .bash_profile, etc.)
+# This restores your normal prompt and fixes the terminal environment variables
+if [ -d /etc/skel ]; then
+    cp -a /etc/skel/. "$HOME_DIR/"
+fi
+
+# 3. Read the actual system language configured in the OS
 SYSTEM_LANG="en_US.UTF-8" # Fallback default
 if [ -f /etc/locale.conf ]; then
-    # This reads the actual lines like LANG="da_DK.UTF-8" or LANG="de_DE.UTF-8"
     source /etc/locale.conf
     SYSTEM_LANG=$LANG
 fi
 
-# 2. Force runuser to execute XDG with the exact system language injected
+# 4. Force runuser to execute XDG with the exact system language injected
+# XDG will look at $SYSTEM_LANG and generate perfectly localized folders
 runuser -l "$USER" -c "export LANG=$SYSTEM_LANG; xdg-user-dirs-update" || true
 
-# Fix ownership so the user can actually write to their new localized folders
+# 5. Securely fix ownership across the entire newly generated tree
 chown -R "$USER:$USER" "$HOME_DIR"
 
 echo "Reset complete."

@@ -8,13 +8,11 @@ Type=simple
 WorkingDirectory=/opt/meshagent
 EnvironmentFile=-/etc/meshagent/meshagent.env
 ExecStartPre=/usr/libexec/meshagent-bootstrap.sh
-ExecStart=/opt/meshagent/meshagent
+ExecStart=/usr/bin/bash -lc 'exec /opt/meshagent/meshagent >>/var/log/meshagent/meshagent.log 2>&1'
 Restart=always
 RestartSec=10
 LogsDirectory=meshagent
 LogsDirectoryMode=0755
-StandardOutput=append:/var/log/meshagent/meshagent.log
-StandardError=append:/var/log/meshagent/meshagent.log
 
 [Install]
 WantedBy=multi-user.target

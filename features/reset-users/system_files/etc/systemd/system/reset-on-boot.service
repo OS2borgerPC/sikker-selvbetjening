@@ -4,7 +4,7 @@ After=local-fs.target
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/kiosk-reset.sh
+ExecStart=/usr/libexec/kiosk-reset.sh
 
 # Run very early, before login screen is used
 DefaultDependencies=no

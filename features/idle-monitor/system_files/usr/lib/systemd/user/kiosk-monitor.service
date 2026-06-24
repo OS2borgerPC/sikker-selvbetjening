@@ -3,4 +3,4 @@ Description=Kiosk Data Protection Monitor
 
 [Service]
 Type=oneshot
-ExecStart=/usr/local/bin/kiosk-monitor.sh
+ExecStart=/usr/libexec/kiosk-monitor.sh

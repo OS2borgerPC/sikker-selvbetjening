@@ -6,7 +6,7 @@ echo "------------------------------------------------"
 
 # Find all .service files inside the temporary features directory
 # (Assumes the Containerfile mounts features to /tmp/features)
-find /tmp/features -type f -name "*.service" | while read -r service_path; do
+find /tmp/features -type f \( -name "*.service" -o -name "*.timer" \) | while read -r service_path; do
     service_name=$(basename "$service_path")
     
     # Scenario 1: User services (located under a .../systemd/user/ path)

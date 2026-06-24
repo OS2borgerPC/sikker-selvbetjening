@@ -5,23 +5,17 @@ USER="bruger"
 HOME_DIR="/var/home/$USER"
 
 echo "[1/4] Terminating user session..."
-
-# Kill systemd user session cleanly first
 loginctl terminate-user "$USER" || true
-
-# Hard kill any remaining processes
 pkill -KILL -u "$USER" || true
 
 
 echo "[2/4] Clearing runtime state..."
-
-# Runtime/session data (DBus, keyring sockets, etc.)
-rm -rf /run/user/* || true
+if USER_UID=$(id -u "$USER" 2>/dev/null); then
+    rm -rf "/run/user/$USER_UID" || true
+fi
 
 
 echo "[3/4] Wiping home directory..."
-
-# Safety check (prevents catastrophic deletes if variable is empty)
 if [[ -d "$HOME_DIR" && "$HOME_DIR" == /var/home/* ]]; then
     rm -rf "$HOME_DIR"
 else
@@ -30,16 +24,22 @@ else
 fi
 
 
-echo "[4/4] Restoring clean home skeleton..."
-
-# Recreate empty home
+echo "[4/4] Generating language-aware XDG home directory..."
+# Recreate a completely empty home directory
 mkdir -p "$HOME_DIR"
 
-# Restore system language-aware directories
-runuser -u "$USER" -- xdg-user-dirs-update || true
+# 1. Read the actual system language configured in the OS
+SYSTEM_LANG="en_US.UTF-8" # Fallback default
+if [ -f /etc/locale.conf ]; then
+    # This reads the actual lines like LANG="da_DK.UTF-8" or LANG="de_DE.UTF-8"
+    source /etc/locale.conf
+    SYSTEM_LANG=$LANG
+fi
 
-# Fix ownership
+# 2. Force runuser to execute XDG with the exact system language injected
+runuser -l "$USER" -c "export LANG=$SYSTEM_LANG; xdg-user-dirs-update" || true
+
+# Fix ownership so the user can actually write to their new localized folders
 chown -R "$USER:$USER" "$HOME_DIR"
-
 
 echo "Reset complete."

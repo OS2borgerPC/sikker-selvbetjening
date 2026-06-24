@@ -9,26 +9,17 @@ CANCEL_LABEL="Nej, arbejd videre"
 
 echo "[+] Kiosk Manual Logout Triggered."
 
-zenity --question \
+# Use Zenity to prompt the user
+if zenity --question \
   --title="$LOGOUT_TITLE" \
   --text="$LOGOUT_MESSAGE" \
   --ok-label="$OK_LABEL" \
   --cancel-label="$CANCEL_LABEL" \
   --width=420 \
-  --modal
+  --modal; then
 
-RESPONSE=$?
-
-if [[ "$RESPONSE" -eq 0 ]]; then
-    echo "[+] User confirmed logout"
-
-    # Preferred safe GNOME method
-    loginctl terminate-session "${XDG_SESSION_ID:-}"
-
-    # Fallback if session ID is missing
-    if [[ $? -ne 0 ]]; then
-        loginctl terminate-user "$USER"
-    fi
+    echo "[+] User confirmed logout. Requesting GNOME session termination..."
+    gnome-session-quit --logout --no-prompt
 
 else
     echo "[~] Logout canceled"

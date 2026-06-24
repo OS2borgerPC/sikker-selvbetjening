@@ -1,14 +1,14 @@
 [Unit]
-Description=Kiosk recovery reset on boot
+Description=Reset Kiosk Home Directory on Boot
+DefaultDependencies=no
 After=local-fs.target
+# CRITICAL: Run before the display manager or auto-login starts
+Before=display-manager.service getty@tty1.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/kiosk-reset.sh
-
-# Run very early, before login screen is used
-DefaultDependencies=no
-Before=display-manager.service
+ExecStart=/usr/libexec/reset-on-boot.sh
+RemainAfterExit=yes
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=sysinit.target

@@ -24,11 +24,11 @@
   block:
     - name: Debug entering mesh agent enable flow
       ansible.builtin.debug:
-        msg: "Mesh agent is enabled. Staging bootstrap and enabling service symlink."
+        msg: "Mesh agent is enabled. Writing runtime env and enabling service symlink."
 
-    - name: Ensure mesh agent script directory exists in staged root
+    - name: Ensure mesh agent config directory exists in staged root
       ansible.builtin.file:
-        path: "{{ output_root }}/usr/libexec"
+        path: "{{ output_root }}/etc/meshagent"
         state: directory
         mode: "0755"
 
@@ -38,58 +38,33 @@
         state: directory
         mode: "0755"
 
-    - name: Write mesh agent bootstrap script
+    - name: Write mesh agent runtime configuration
       ansible.builtin.copy:
-        dest: "{{ output_root }}/usr/libexec/meshagent-bootstrap.sh"
-        mode: "0755"
+        dest: "{{ output_root }}/etc/meshagent/meshagent.env"
+        mode: "0644"
         content: |
-          #!/usr/bin/env bash
-          set -euo pipefail
+          MESH_AGENT_URL="{{ mesh_agent_url_normalized }}"
+          MESH_AGENT_GROUPID="{{ mesh_agent_groupid }}"
+          MESH_AGENT_ID="6"
 
-          AGENT_DIR="/opt/meshagent"
-          AGENT_BIN="${AGENT_DIR}/meshagent"
-          AGENT_MSH="${AGENT_DIR}/meshagent.msh"
-          AGENT_GROUP_MARKER="${AGENT_DIR}/.groupid"
-          LOG_DIR="/var/log/meshagent"
-          LOG_FILE="${LOG_DIR}/meshagent.log"
-          BASE_URL="{{ mesh_agent_url_normalized }}"
-          GROUP_ID="{{ mesh_agent_groupid }}"
-          AGENT_ID="6"
-
-          mkdir -p "${AGENT_DIR}" "${LOG_DIR}"
-          touch "${LOG_FILE}"
-          chmod 0644 "${LOG_FILE}" || true
-
-          if [[ ! -x "${AGENT_BIN}" ]]; then
-            curl -fsSL "${BASE_URL}/meshagents?id=${AGENT_ID}" -o "${AGENT_BIN}"
-            chmod +x "${AGENT_BIN}"
-          fi
-
-          if command -v restorecon >/dev/null 2>&1; then
-            restorecon -RF "${AGENT_DIR}" "${LOG_DIR}" || true
-          fi
-          if command -v chcon >/dev/null 2>&1; then
-            chcon --reference /usr/bin/bash "${AGENT_BIN}" || true
-          fi
-
-          if [[ ! -f "${AGENT_GROUP_MARKER}" ]] || [[ "$(cat "${AGENT_GROUP_MARKER}")" != "${GROUP_ID}" ]]; then
-            curl -fsSL "${BASE_URL}/meshsettings?id=${GROUP_ID}" -o "${AGENT_MSH}"
-            printf '%s' "${GROUP_ID}" > "${AGENT_GROUP_MARKER}"
-          elif [[ ! -s "${AGENT_MSH}" ]]; then
-            curl -fsSL "${BASE_URL}/meshsettings?id=${GROUP_ID}" -o "${AGENT_MSH}"
-          fi
+    - name: Debug mesh agent runtime configuration keys
+      ansible.builtin.debug:
+        msg:
+          - "meshagent_env_path={{ output_root }}/etc/meshagent/meshagent.env"
+          - "meshagent_env_keys=MESH_AGENT_URL,MESH_AGENT_GROUPID,MESH_AGENT_ID"
 
     - name: Enable mesh agent service in staged root
       ansible.builtin.file:
         src: ../meshagent.service
         dest: "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
         state: link
+        force: true
 
     - name: Collect mesh agent staged artifact stats
       ansible.builtin.stat:
         path: "{{ mesh_agent_staged_artifact }}"
       loop:
-        - "{{ output_root }}/usr/libexec/meshagent-bootstrap.sh"
+        - "{{ output_root }}/etc/meshagent/meshagent.env"
         - "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
       loop_control:
         loop_var: mesh_agent_staged_artifact
@@ -115,7 +90,7 @@
           command: bash
           args:
             - -lc
-            - rm -f /etc/systemd/system/multi-user.target.wants/meshagent.service /usr/libexec/meshagent-bootstrap.sh || true; systemctl daemon-reload || true; systemctl disable --now meshagent.service || true; rm -rf /opt/meshagent /var/log/meshagent
+            - rm -f /etc/systemd/system/multi-user.target.wants/meshagent.service /etc/meshagent/meshagent.env || true; systemctl daemon-reload || true; systemctl disable --now meshagent.service || true; rm -rf /opt/meshagent /var/log/meshagent
 
     - name: Debug post-steps before cleanup removal for enabled mesh agent
       ansible.builtin.debug:

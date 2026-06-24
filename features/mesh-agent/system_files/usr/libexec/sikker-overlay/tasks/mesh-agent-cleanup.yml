@@ -23,7 +23,7 @@
         state: absent
       loop:
         - "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
-        - "{{ output_root }}/usr/libexec/meshagent-bootstrap.sh"
+        - "{{ output_root }}/etc/meshagent/meshagent.env"
       loop_control:
         loop_var: mesh_agent_artifact
 
@@ -40,7 +40,7 @@
           command: bash
           args:
             - -lc
-            - rm -f /etc/systemd/system/multi-user.target.wants/meshagent.service /usr/libexec/meshagent-bootstrap.sh || true; systemctl daemon-reload || true; systemctl disable --now meshagent.service || true; rm -rf /opt/meshagent /var/log/meshagent
+            - rm -f /etc/systemd/system/multi-user.target.wants/meshagent.service /etc/meshagent/meshagent.env || true; systemctl daemon-reload || true; systemctl disable --now meshagent.service || true; rm -rf /opt/meshagent /var/log/meshagent
 
     - name: Debug post-steps before cleanup add for disabled mesh agent
       ansible.builtin.debug:

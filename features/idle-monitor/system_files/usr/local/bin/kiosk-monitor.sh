@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-# 2 minutes
+# 2 minutes (in milliseconds)
 IDLE_THRESHOLD=120000
 PROMPT_TIMEOUT=30
 
@@ -10,46 +10,54 @@ WARNING_TITLE="Inaktivitet opdaget"
 WARNING_MESSAGE="Er du der stadig?\n\nHvis du ikke reagerer, bliver du logget ud."
 BUTTON_LABEL="Jeg er her stadig"
 
-echo "[+] Kiosk idle monitor started"
+# Get current idle time (ms) from GNOME Mutter
+raw_idle=$(gdbus call --session \
+    --dest org.gnome.Mutter.IdleMonitor \
+    --object-path /org/gnome/Mutter/IdleMonitor/Core \
+    --method org.gnome.Mutter.IdleMonitor.GetIdletime)
 
-while true; do
+idle_ms=$(echo "$raw_idle" | grep -oE '[0-9]+' | head -n1)
 
-    # Get idle time (ms)
-    raw_idle=$(gdbus call --session \
-        --dest org.gnome.Mutter.IdleMonitor \
-        --object-path /org/gnome/Mutter/IdleMonitor/Core \
-        --method org.gnome.Mutter.IdleMonitor.GetIdletime)
+# Validate we got a number back
+[[ "$idle_ms" =~ ^[0-9]+$ ]] || exit 0
 
-    idle_ms=$(echo "$raw_idle" | grep -oE '[0-9]+' | head -n1)
-    
-    # Validate
-    [[ "$idle_ms" =~ ^[0-9]+$ ]] || { sleep 2; continue; }
+# Convert metrics to seconds for clean comparison
+idle_sec=$(( idle_ms / 1000 ))
+threshold_sec=$(( IDLE_THRESHOLD / 1000 ))
 
-    # Only act when threshold is reached
-    if (( idle_ms >= IDLE_THRESHOLD )); then
+# Calculate exactly how many seconds this user session has been alive
+session_start=$(stat -c %Y "$XDG_RUNTIME_DIR")
+now=$(date +%s)
+session_sec=$(( now - session_start ))
 
-        echo "[!] Idle threshold reached"
+# CRITICAL KIOSK CHECK: If idle time is equal to (or within 5s of) the session age,
+# it means the mouse/keyboard has NEVER been touched since the browser opened.
+# Exit immediately and let the browser stand open.
+if (( idle_sec >= (session_sec - 5) )); then
+    exit 0
+fi
 
-        zenity --warning \
-            --title="$WARNING_TITLE" \
-            --text="$WARNING_MESSAGE" \
-            --ok-label="$BUTTON_LABEL" \
-            --timeout="$PROMPT_TIMEOUT" \
-            --width=450 \
-            --modal
+# If the user is currently active, exit immediately
+if (( idle_sec < threshold_sec )); then
+    exit 0
+fi
 
-        RESPONSE=$?
+echo "[!] Active session has gone idle. Displaying warning prompt..."
 
-        if (( RESPONSE == 0 )); then
-            echo "[+] User active → logging out"
-            loginctl terminate-user "$USER"
-        else
-            echo "[~] No response → continuing session"
-        fi
+zenity --warning \
+    --title="$WARNING_TITLE" \
+    --text="$WARNING_MESSAGE" \
+    --ok-label="$BUTTON_LABEL" \
+    --timeout="$PROMPT_TIMEOUT" \
+    --width=450 \
+    --modal
 
-        # prevent immediate retrigger spam
-        sleep $PROMPT_TIMEOUT
-    fi
+RESPONSE=$?
 
-    sleep 2
-done
+if (( RESPONSE == 0 )); then
+    echo "[+] User clicked button → continuing session"
+    # GNOME automatically resets its idle counter to 0 because the user clicked OK.
+else
+    echo "[!] No response or timeout → logging out user"
+    loginctl terminate-user "$USER"
+fi

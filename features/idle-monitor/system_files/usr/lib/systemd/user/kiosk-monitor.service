@@ -2,10 +2,5 @@
 Description=Kiosk Data Protection Monitor
 
 [Service]
-Type=simple
+Type=oneshot
 ExecStart=/usr/local/bin/kiosk-monitor.sh
-Restart=on-failure
-RestartSec=3
-
-[Install]
-WantedBy=default.target

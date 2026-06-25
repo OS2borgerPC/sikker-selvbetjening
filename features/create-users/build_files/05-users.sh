@@ -13,9 +13,7 @@ passwd -d bruger
 # ----------------------------
 # Admin user (maintenance)
 # ----------------------------
-# Added -G wheel,sudo to attach the user to secondary administrative groups
-useradd -u 1001 -m -s /bin/bash -G wheel,sudo -c "Super User" superuser
-
+useradd -u 1001 -m -s /bin/bash -G wheel -c "Super User" superuser
 echo "superuser:superuser" | chpasswd
 
 # Give explicit passwordless sudo access for development convenience

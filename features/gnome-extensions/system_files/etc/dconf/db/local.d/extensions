@@ -1,14 +1,32 @@
-# using the same schema twice, will overwrite the former, so use arrays if necessary
-# arrays must not have any white space
+# ==============================================================================
+# IMPORTANT RULE:
+# Using the same schema twice will overwrite the former, so use arrays if necessary.
+# ARRAYS MUST NOT HAVE ANY WHITESPACE!
+# ==============================================================================
 
-# dash-to-panel (windows-like taskbar)
-# apps-menu (windows-like start menu)
+# ==============================================================================
+# LOADED EXTENSIONS (Core Array Mapping)
+# ==============================================================================
 [org/gnome/shell]
-enabled-extensions=['dash-to-panel@jderose9.github.com','apps-menu@gnome-shell-extensions.gcampax.github.com']
+enabled-extensions=['dash-to-panel@jderose9.github.com','apps-menu@gnome-shell-extensions.gcampax.github.com','just-perfection-desktop@just-perfection']
 
-# settings for dash-to-panel (taskbar)
+# ==============================================================================
+# DASH TO PANEL SETTINGS (Windows-like taskbar layout)
+# ==============================================================================
 [org/gnome/shell/extensions/dash-to-panel]
 group-apps=false
 show-running-apps=true
 overview-click-to-exit=true
 hide-overview-on-startup=true
+show-activities-button=false
+taskbar-locked=true
+
+# ==============================================================================
+# JUST PERFECTION SETTINGS (Micro UI Hiding & Workspace Bypassing)
+# ==============================================================================
+[org/gnome/shell/extensions/just-perfection]
+power-icon=false
+show-apps-button=false
+workspaces-in-app-grid=false
+# Startup Status: 0 = Desktop, 1 = Overview
+startup-status=0

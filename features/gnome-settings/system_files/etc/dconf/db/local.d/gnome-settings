@@ -1,30 +1,44 @@
-# window buttons
+# ==============================================================================
+# WINDOW BUTTONS & WORKSPACES
+# ==============================================================================
 [org/gnome/desktop/wm/preferences]
 button-layout='appmenu:minimize,maximize,close'
+num-workspaces=1
 
-# accessibility
+# ==============================================================================
+# ACCESSIBILITY
+# ==============================================================================
 [org/gnome/desktop/a11y]
 always-show-universal-access-status=true
 
-# calendar
+# ==============================================================================
+# CALENDAR
+# ==============================================================================
 [org/gnome/desktop/calendar]
 show-weekdate=true
 
-# interface
+# ==============================================================================
+# INTERFACE
+# ==============================================================================
 [org/gnome/desktop/interface]
 clock-show-weekday=true
 enable-hot-corners=false
 toolkit-accessibility=true
 
-# login screen
+# ==============================================================================
+# LOGIN SCREEN
+# ==============================================================================
 [org/gnome/login-screen]
 enable-fingerprint-authentication=false
 enable-smartcard-authentication=false
 enable-password-authentication=false
 enable-auto-login=true
 
-# lockdown
+# ==============================================================================
+# LOCKDOWN
+# ==============================================================================
 [org/gnome/desktop/lockdown]
+disable-application-handlers=true
 disable-command-line=true
 disable-lock-screen=true
 disable-save-to-disk=true
@@ -33,25 +47,48 @@ disable-user-switching=true
 disable-log-out=false
 user-administration-disabled=true
 
-# notifications
+# ==============================================================================
+# NOTIFICATIONS
+# ==============================================================================
 [org/gnome/desktop/notifications]
 show-banners=false
 show-in-lock-screen=false
 
-# keyboard
+# ==============================================================================
+# KEYBOARD
+# ==============================================================================
 [org/gnome/desktop/peripherals/keyboard]
 numlock-state=true
 
-# privacy
+# ==============================================================================
+# PRIVACY
+# ==============================================================================
 [org/gnome/desktop/privacy]
 remember-app-usage=false
 report-technical-problems=false
 
-# workspaces
+# ==============================================================================
+# WORKSPACES MUTTER MANAGEMENT
+# ==============================================================================
 [org/gnome/mutter]
 dynamic-workspaces=false
 
-# screensaver / idle
+# ==============================================================================
+# WORKSPACE KEYBINDINGS HARD LOCKDOWN
+# ==============================================================================
+[org/gnome/desktop/wm/keybindings]
+switch-to-workspace-left=['disabled']
+switch-to-workspace-right=['disabled']
+switch-to-workspace-up=['disabled']
+switch-to-workspace-down=['disabled']
+move-to-workspace-left=['disabled']
+move-to-workspace-right=['disabled']
+move-to-workspace-up=['disabled']
+move-to-workspace-down=['disabled']
+
+# ==============================================================================
+# SCREENSAVER / IDLE
+# ==============================================================================
 [org/gnome/desktop/screensaver]
 idle-activation-enabled=false
 lock-enabled=false
@@ -61,7 +98,9 @@ user-switch-enabled=false
 [org/gnome/desktop/session]
 idle-delay=uint32 0
 
-# power (disable sleep)
+# ==============================================================================
+# POWER (DISABLE SLEEP)
+# ==============================================================================
 [org/gnome/settings-daemon/plugins/power]
 sleep-inactive-ac-type='nothing'
 sleep-inactive-battery-type='nothing'

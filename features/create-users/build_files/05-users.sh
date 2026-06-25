@@ -13,13 +13,14 @@ passwd -d bruger
 # ----------------------------
 # Admin user (maintenance)
 # ----------------------------
-useradd -u 1001 -m -s /bin/bash -c "Super User" superuser
+# Added -G wheel,sudo to attach the user to secondary administrative groups
+useradd -u 1001 -m -s /bin/bash -G wheel,sudo -c "Super User" superuser
 
 echo "superuser:superuser" | chpasswd
 
-# Give sudo access (clean file, not append)
+# Give explicit passwordless sudo access for development convenience
 cat > /etc/sudoers.d/superuser <<EOF
-superuser ALL=(ALL) ALL
+superuser ALL=(ALL) NOPASSWD: ALL
 EOF
 
 chmod 0440 /etc/sudoers.d/superuser

@@ -7,7 +7,7 @@ Before=display-manager.service getty@tty1.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/libexec/reset-on-boot.sh
+ExecStart=/usr/libexec/kiosk-reset.sh
 RemainAfterExit=yes
 
 [Install]

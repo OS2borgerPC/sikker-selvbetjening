@@ -1,0 +1,111 @@
+---
+- name: Resolve MeshCentral enablement inputs
+  ansible.builtin.set_fact:
+    mesh_agent_url: "{{ ((mesh_agent | default({})).url | default('')) | string | trim }}"
+    mesh_agent_groupid: "{{ ((mesh_agent | default({})).groupid | default('')) | string | trim }}"
+    mesh_agent_enabled: >-
+      {{
+        ((((mesh_agent | default({})).url | default('')) | string | trim) | length > 0)
+        and
+        ((((mesh_agent | default({})).groupid | default('')) | string | trim) | length > 0)
+      }}
+    mesh_agent_url_normalized: "{{ (((mesh_agent | default({})).url | default('')) | string | trim) | regex_replace('/+$', '') }}"
+
+- name: Debug mesh agent enablement resolution
+  ansible.builtin.debug:
+    msg:
+      - "mesh_agent_enabled={{ mesh_agent_enabled | bool }}"
+      - "mesh_agent_url_normalized={{ mesh_agent_url_normalized }}"
+      - "mesh_agent_groupid_length={{ mesh_agent_groupid | length }}"
+      - "output_root={{ output_root }}"
+
+- name: Configure MeshCentral agent when URL and groupid are present
+  when: mesh_agent_enabled | bool
+  block:
+    - name: Debug entering mesh agent enable flow
+      ansible.builtin.debug:
+        msg: "Mesh agent is enabled. Writing runtime env and enabling service symlink."
+
+    - name: Ensure mesh agent config directory exists in staged root
+      ansible.builtin.file:
+        path: "{{ output_root }}/etc/meshagent"
+        state: directory
+        mode: "0755"
+
+    - name: Ensure systemd wants directory exists in staged root
+      ansible.builtin.file:
+        path: "{{ output_root }}/etc/systemd/system/multi-user.target.wants"
+        state: directory
+        mode: "0755"
+
+    - name: Write mesh agent runtime configuration
+      ansible.builtin.copy:
+        dest: "{{ output_root }}/etc/meshagent/meshagent.env"
+        mode: "0644"
+        content: |
+          MESH_AGENT_URL="{{ mesh_agent_url_normalized }}"
+          MESH_AGENT_GROUPID="{{ mesh_agent_groupid }}"
+          MESH_AGENT_ID="6"
+
+    - name: Debug mesh agent runtime configuration keys
+      ansible.builtin.debug:
+        msg:
+          - "meshagent_env_path={{ output_root }}/etc/meshagent/meshagent.env"
+          - "meshagent_env_keys=MESH_AGENT_URL,MESH_AGENT_GROUPID,MESH_AGENT_ID"
+
+    - name: Enable mesh agent service in staged root
+      ansible.builtin.file:
+        src: ../meshagent.service
+        dest: "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
+        state: link
+        force: true
+
+    - name: Collect mesh agent staged artifact stats
+      ansible.builtin.stat:
+        path: "{{ mesh_agent_staged_artifact }}"
+      loop:
+        - "{{ output_root }}/etc/meshagent/meshagent.env"
+        - "{{ output_root }}/etc/systemd/system/multi-user.target.wants/meshagent.service"
+      loop_control:
+        loop_var: mesh_agent_staged_artifact
+      register: mesh_agent_staged_stats
+
+    - name: Debug mesh agent staged artifact stats
+      ansible.builtin.debug:
+        msg: "path={{ item.stat.path }} exists={{ item.stat.exists }} islnk={{ item.stat.islnk | default(false) }} mode={{ item.stat.mode | default('n/a') }} size={{ item.stat.size | default('n/a') }}"
+      loop: "{{ mesh_agent_staged_stats.results }}"
+      loop_control:
+        label: "{{ item.stat.path }}"
+
+    - name: Read post-steps configuration
+      ansible.builtin.slurp:
+        path: "{{ output_root }}/post-steps.json"
+      register: post_steps_raw
+
+    - name: Parse post-steps configuration
+      ansible.builtin.set_fact:
+        post_steps_doc: "{{ post_steps_raw.content | b64decode | from_json }}"
+        mesh_agent_cleanup_step:
+          action: run
+          command: bash
+          args:
+            - -lc
+            - rm -f /etc/systemd/system/multi-user.target.wants/meshagent.service /etc/meshagent/meshagent.env || true; systemctl daemon-reload || true; systemctl disable --now meshagent.service || true; rm -rf /opt/meshagent /var/log/meshagent
+
+    - name: Debug post-steps before cleanup removal for enabled mesh agent
+      ansible.builtin.debug:
+        msg: "post_steps_count_before={{ (post_steps_doc.steps | default([])) | length }}"
+
+    - name: Remove mesh agent cleanup step when mesh agent is enabled
+      ansible.builtin.set_fact:
+        post_steps_doc: "{{ post_steps_doc | combine({'steps': (post_steps_doc.steps | default([]) | reject('equalto', mesh_agent_cleanup_step) | list)}, recursive=True) }}"
+
+    - name: Write post-steps configuration
+      ansible.builtin.copy:
+        dest: "{{ output_root }}/post-steps.json"
+        mode: "0644"
+        content: "{{ post_steps_doc | to_nice_json }}\n"
+
+    - name: Debug post-steps after cleanup removal for enabled mesh agent
+      ansible.builtin.debug:
+        msg: "post_steps_count_after={{ (post_steps_doc.steps | default([])) | length }}"

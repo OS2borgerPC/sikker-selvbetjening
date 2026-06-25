@@ -5,7 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=/opt/meshagent
+WorkingDirectory=/
 EnvironmentFile=-/etc/meshagent/meshagent.env
 ExecStartPre=/usr/libexec/meshagent-bootstrap.sh
 ExecStart=/usr/bin/bash -lc 'exec /opt/meshagent/meshagent >>/var/log/meshagent/meshagent.log 2>&1'

@@ -9,10 +9,12 @@ eula --agreed
 zerombr
 clearpart --all --initlabel
 
-# NEW PARTITIONING: Replaces the old LVM autopart line to take 100% of disk space
+# Standard UEFI requirement
 reqpart
-part /boot --fstype="ext4" --size=1024
-part / --fstype="ext4" --grow --size=1
+
+# Let Anaconda automatically configure the optimal Btrfs subvolume layout 
+# natively designed for Fedora Silverblue/OSTree
+autopart --type=btrfs
 
 # Network - use DHCP
 network --bootproto=dhcp --onboot=on --activate

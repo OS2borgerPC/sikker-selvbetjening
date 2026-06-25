@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Configuration (Time in milliseconds)
-# 2 minutes = 120000 ms
-IDLE_THRESHOLD=120000 
+# 1 hour = 3600000 ms
+IDLE_THRESHOLD=3600000
 # Time given to user to respond (in seconds)
 PROMPT_TIMEOUT=30
 

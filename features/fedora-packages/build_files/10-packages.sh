@@ -5,6 +5,7 @@ set -ouex pipefail
 # Packages can be installed from any enabled yum repo on the image.
 # RPMfusion repos are available by default in ublue main images.
 dnf5 install -y \
+	gnome-shell-extension-just-perfection \
 	gnome-shell-extension-dash-to-panel \
 	gnome-shell-extension-apps-menu \
 	glibc-langpack-da \
@@ -31,6 +32,7 @@ dnf5 remove -y \
 
 #list of what each package does respectively:
 
+# gnome-shell-extension-just-perfection: tweak tool to hide UI elements and change behaviors
 # gnome-shell-extension-dash-to-panel: windows-like taskbar for gnome
 # gnome-shell-extension-apps-menu: adds an applications menu to the top bar
 # glibc-langpack-da: Danish language support for glibc

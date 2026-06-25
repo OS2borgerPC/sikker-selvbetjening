@@ -2,15 +2,23 @@
 
 set -ouex pipefail
 
-# Create user 1000 to prevent first-boot user creation dialog
-# This user will be the default interactive user
-useradd -u 1000 -m -s /bin/bash -c "Super User" superuser
+# ----------------------------
+# Kiosk user (public session)
+# ----------------------------
+useradd -u 1000 -m -s /bin/bash -c "Bruger" bruger
 
-# Set password
+# Passwordless login (required for auto-login setups)
+passwd -d bruger
+
+# ----------------------------
+# Admin user (maintenance)
+# ----------------------------
+useradd -u 1001 -m -s /bin/bash -G wheel -c "Super User" superuser
 echo "superuser:superuser" | chpasswd
 
-# Allow sudo with password required
-echo "superuser ALL=(ALL) ALL" >> /etc/sudoers.d/superuser
-chmod 0440 /etc/sudoers.d/superuser
+# Give explicit passwordless sudo access for development convenience
+cat > /etc/sudoers.d/superuser <<EOF
+superuser ALL=(ALL) NOPASSWD: ALL
+EOF
 
-# citizen user will be created on every boot by /usr/libexec/sikker-reset-bruger-home
+chmod 0440 /etc/sudoers.d/superuser

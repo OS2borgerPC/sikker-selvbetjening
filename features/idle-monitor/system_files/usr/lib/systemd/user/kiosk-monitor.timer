@@ -1,0 +1,11 @@
+[Unit]
+Description=Check kiosk idle status periodically
+
+[Timer]
+# Wait 1 minute after user logs in before starting checks
+OnStartupSec=1min
+# Check every 30 seconds thereafter
+OnUnitActiveSec=30sec
+
+[Install]
+WantedBy=timers.target

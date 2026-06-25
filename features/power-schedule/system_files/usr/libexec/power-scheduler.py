@@ -92,4 +92,4 @@ while True:
         # Open hours: Ensure display backlight is actively powered on
         subprocess.run("vbetool dpms on", shell=True)
 
-    time.sleep(60)
+    time.sleep(600)

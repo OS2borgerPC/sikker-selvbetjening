@@ -1,29 +1,27 @@
 #!/bin/bash
 
-# Configuration
+set -euo pipefail
+
 LOGOUT_TITLE="Log ud?"
-LOGOUT_MESSAGE="Er du sikker på, at du vil logge ud?\n\nAlt du har gjort bliver slettet og computeeren genstarter, for din digital sikkerhed."
+LOGOUT_MESSAGE="Er du sikker på, at du vil logge ud?\n\nAlt du har gjort bliver slettet, og du vender tilbage til login-skærmen."
 OK_LABEL="Ja, log mig ud"
-CANCEL_LABEL="Nej, Arbejd videre"
+CANCEL_LABEL="Nej, arbejd videre"
 
 echo "[+] Kiosk Manual Logout Triggered."
 
-# Launch the interactive Zenity question dialog box
-zenity --question \
-       --title="$LOGOUT_TITLE" \
-       --text="$LOGOUT_MESSAGE" \
-       --ok-label="$OK_LABEL" \
-       --cancel-label="$CANCEL_LABEL" \
-       --width=420 \
-       --modal
+# Use Zenity to prompt the user
+if zenity --question \
+  --title="$LOGOUT_TITLE" \
+  --text="$LOGOUT_MESSAGE" \
+  --ok-label="$OK_LABEL" \
+  --cancel-label="$CANCEL_LABEL" \
+  --width=420 \
+  --modal; then
 
-# Capture Zenity's exit status (0 = User clicked OK, 1 = User clicked Cancel/Closed window)
-RESPONSE=$?
+    echo "[+] User confirmed logout. Requesting GNOME session termination..."
+    gnome-session-quit --logout --no-prompt
 
-if [ "$RESPONSE" -eq 0 ]; then
-    echo "[!] User confirmed logout. Executing secure reboot without authentication..."
-    /usr/libexec/reboot-handler.sh
 else
-    echo "[~] Logout canceled by user. Returning to session."
+    echo "[~] Logout canceled"
     exit 0
 fi

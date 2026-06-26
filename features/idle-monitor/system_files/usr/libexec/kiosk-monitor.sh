@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-# 2 minutes (in milliseconds)
-IDLE_THRESHOLD=120000
+# 1 hour (in milliseconds)
+IDLE_THRESHOLD=3600000
 PROMPT_TIMEOUT=30
 
 WARNING_TITLE="Inaktivitet opdaget"

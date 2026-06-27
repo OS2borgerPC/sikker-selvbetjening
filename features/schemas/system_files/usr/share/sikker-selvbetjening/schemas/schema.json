@@ -214,8 +214,14 @@
     "device_group_entry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "policies", "image_name"],
+      "required": ["id", "name", "policies", "image_name"],
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable device group identifier used for cross-references.",
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "minLength": 1
+        },
         "name": {
           "type": "string",
           "title": "Device Group Name",

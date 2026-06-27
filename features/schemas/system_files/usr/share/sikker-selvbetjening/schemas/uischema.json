@@ -33,6 +33,12 @@
     }
   },
   "device_groups": {
-    "items": {}
+    "items": {
+      "id": {
+        "ui:widget": "hidden",
+        "ui:autogen": "device-group-id",
+        "ui:readonly": true
+      }
+    }
   }
 }

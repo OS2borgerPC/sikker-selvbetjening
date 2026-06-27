@@ -84,12 +84,18 @@
     },
     "policy_entry": {
       "type": "object",
-      "required": ["name"],
+      "required": ["id", "name"],
       "additionalProperties": false,
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable policy identifier used for cross-references from device groups.",
+          "pattern": "^[a-z][a-z0-9_-]*$",
+          "minLength": 1
+        },
         "name": {
           "type": "string",
-          "description": "Unique policy identifier. Used as the image name in the build pipeline.",
+          "description": "Human-readable policy name. Used as the image name in the build pipeline.",
           "pattern": "^[a-z][a-z0-9-]*$",
           "minLength": 1
         },
@@ -224,10 +230,12 @@
         "policies": {
           "type": "array",
           "title": "Policies",
+          "description": "List of policy IDs assigned to this device group.",
           "minItems": 1,
           "items": {
             "type": "string",
-            "title": "Policy Name",
+            "title": "Policy ID",
+            "pattern": "^[a-z][a-z0-9_-]*$",
             "minLength": 1
           },
           "uniqueItems": true

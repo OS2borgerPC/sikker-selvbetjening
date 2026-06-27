@@ -2,10 +2,15 @@
   "policies": {
     "desktop": {
       "background_image_file": {
-        "ui:widget": "file",
-        "ui:options": {
-          "accept": "image/*",
-          "assetPrefixTemplate": "config/assets/{domain}/"
+        "ui:widget": "file"
+      }
+    },
+    "printer": {
+      "printers": {
+        "items": {
+          "ppd_file": {
+            "ui:widget": "file"
+          }
         }
       }
     },

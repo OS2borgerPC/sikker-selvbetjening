@@ -26,5 +26,8 @@
         "groupid": {}
       }
     }
+  },
+  "device_groups": {
+    "items": {}
   }
 }

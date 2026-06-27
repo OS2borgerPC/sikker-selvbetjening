@@ -1,22 +1,30 @@
 {
   "policies": {
-    "desktop": {
-      "background_image_file": {
-        "ui:widget": "file"
-      }
-    },
-    "printer": {
-      "printers": {
-        "items": {
-          "ppd_file": {
-            "ui:widget": "file"
+    "items": {
+      "desktop": {
+        "background_image_file": {
+          "ui:widget": "file"
+        }
+      },
+      "printer": {
+        "printers": {
+          "items": {
+            "oneOf": [
+              {},
+              {
+                "ppd_file": {
+                  "ui:widget": "file"
+                }
+              },
+              {}
+            ]
           }
         }
+      },
+      "mesh_agent": {
+        "url": {},
+        "groupid": {}
       }
-    },
-    "mesh_agent": {
-      "url": {},
-      "groupid": {}
     }
   }
 }

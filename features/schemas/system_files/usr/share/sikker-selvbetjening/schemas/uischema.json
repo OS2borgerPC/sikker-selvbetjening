@@ -34,11 +34,7 @@
   },
   "device_groups": {
     "items": {
-      "id": {
-        "ui:widget": "hidden",
-        "ui:autogen": "device-group-id",
-        "ui:readonly": true
-      }
+      "id": {}
     }
   }
 }

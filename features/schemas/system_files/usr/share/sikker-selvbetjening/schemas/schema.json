@@ -89,9 +89,10 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Stable policy identifier used for cross-references from device groups.",
+          "description": "Stable policy identifier used for cross-references from device groups. In the plugin UI this is auto-generated when creating a new policy.",
           "pattern": "^[a-z][a-z0-9_-]*$",
-          "minLength": 1
+          "minLength": 1,
+          "x-ssb-autogen": "policy-id"
         },
         "name": {
           "type": "string",

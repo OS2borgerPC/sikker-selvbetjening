@@ -219,7 +219,7 @@
         "id": {
           "type": "string",
           "description": "Stable device group identifier used for cross-references.",
-          "pattern": "^[a-z][a-z0-9_-]*$",
+          "pattern": "^(mesh/[^\\s/]+/[^\\s/]+|[a-z][a-z0-9_-]*)$",
           "minLength": 1
         },
         "name": {

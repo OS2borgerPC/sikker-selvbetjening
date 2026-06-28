@@ -1,4 +1,72 @@
 {
+  "domains": {
+    "items": {
+      "policies": {
+        "items": {
+          "id": {
+            "ui:disabled": true
+          },
+          "desktop": {
+            "background_image_file": {
+              "ui:widget": "file"
+            }
+          },
+          "printer": {
+            "printers": {
+              "no_ppd": {
+                "ui:options": {
+                  "addable": true,
+                  "removable": true,
+                  "orderable": false
+                },
+                "items": {
+                  "printer-type": {
+                    "ui:widget": "hidden"
+                  }
+                }
+              },
+              "with_ppd": {
+                "ui:options": {
+                  "addable": true,
+                  "removable": true,
+                  "orderable": false
+                },
+                "items": {
+                  "printer-type": {
+                    "ui:widget": "hidden"
+                  },
+                  "ppd_file": {
+                    "ui:widget": "file"
+                  }
+                }
+              },
+              "princh": {
+                "ui:options": {
+                  "addable": true,
+                  "removable": true,
+                  "orderable": false
+                },
+                "items": {
+                  "printer-type": {
+                    "ui:widget": "hidden"
+                  }
+                }
+              }
+            }
+          },
+          "mesh_agent": {
+            "url": {},
+            "groupid": {}
+          }
+        }
+      },
+      "device_groups": {
+        "items": {
+          "id": {}
+        }
+      }
+    }
+  },
   "policies": {
     "items": {
       "id": {

@@ -2,7 +2,7 @@
   "policies": {
     "items": {
       "id": {
-        "ui:readonly": true
+        "ui:disabled": true
       },
       "desktop": {
         "background_image_file": {

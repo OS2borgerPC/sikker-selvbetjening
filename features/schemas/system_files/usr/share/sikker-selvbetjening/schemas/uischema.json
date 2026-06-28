@@ -1,7 +1,9 @@
 {
   "policies": {
     "items": {
-      "id": {},
+      "id": {
+        "ui:readonly": true
+      },
       "desktop": {
         "background_image_file": {
           "ui:widget": "file"

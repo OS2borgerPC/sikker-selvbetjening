@@ -1,11 +1,7 @@
 {
   "policies": {
     "items": {
-      "id": {
-        "ui:widget": "hidden",
-        "ui:autogen": "policy-id",
-        "ui:readonly": true
-      },
+      "id": {},
       "desktop": {
         "background_image_file": {
           "ui:widget": "file"

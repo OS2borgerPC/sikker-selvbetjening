@@ -316,8 +316,21 @@
           "description": "Optional transport protocol used to reach the printer, for example ipp or socket.",
           "minLength": 1
         },
-        "settings": {
-          "$ref": "#/$defs/printer_settings"
+        "page_size": {
+          "type": "string",
+          "description": "Default page size to use when printing, for example A4."
+        },
+        "color_mode": {
+          "type": "string",
+          "description": "Default color mode, for example rgb or grayscale."
+        },
+        "duplex": {
+          "type": "string",
+          "description": "Default duplex mode, for example none or duplex_tumble."
+        },
+        "orientation": {
+          "type": "string",
+          "description": "Default print orientation, for example portrait or landscape."
         },
         "is_default": {
           "type": "boolean",
@@ -359,8 +372,21 @@
           "description": "Optional transport protocol used to reach the printer, for example ipp or socket.",
           "minLength": 1
         },
-        "settings": {
-          "$ref": "#/$defs/printer_settings"
+        "page_size": {
+          "type": "string",
+          "description": "Default page size to use when printing, for example A4."
+        },
+        "color_mode": {
+          "type": "string",
+          "description": "Default color mode, for example rgb or grayscale."
+        },
+        "duplex": {
+          "type": "string",
+          "description": "Default duplex mode, for example none or duplex_tumble."
+        },
+        "orientation": {
+          "type": "string",
+          "description": "Default print orientation, for example portrait or landscape."
         },
         "ppd_file": {
           "$ref": "#/$defs/asset_file_ppd",
@@ -406,29 +432,6 @@
         "is_default": {
           "type": "boolean",
           "description": "Optional legacy flag. Currently not enforced by schema."
-        }
-      }
-    },
-    "printer_settings": {
-      "type": "object",
-      "description": "Optional default print settings for a printer profile.",
-      "additionalProperties": false,
-      "properties": {
-        "page_size": {
-          "type": "string",
-          "description": "Default page size to use when printing, for example A4."
-        },
-        "color_mode": {
-          "type": "string",
-          "description": "Default color mode, for example rgb or grayscale."
-        },
-        "duplex": {
-          "type": "string",
-          "description": "Default duplex mode, for example none or duplex_tumble."
-        },
-        "orientation": {
-          "type": "string",
-          "description": "Default print orientation, for example portrait or landscape."
         }
       }
     }

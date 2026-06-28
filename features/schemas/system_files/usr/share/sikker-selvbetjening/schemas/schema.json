@@ -127,10 +127,34 @@
           "additionalProperties": false,
           "properties": {
             "printers": {
-              "type": "array",
-              "description": "List of printers. You can add zero, one, or more printers of type no_ppd, with_ppd, and princh.",
-              "items": {
-                "$ref": "#/$defs/printer_entry"
+              "type": "object",
+              "description": "Typed printer collections. Add zero, one, or more printers under each printer type.",
+              "additionalProperties": false,
+              "properties": {
+                "no_ppd": {
+                  "type": "array",
+                  "title": "No PPD Printers",
+                  "description": "Printers that do not require a PPD file.",
+                  "items": {
+                    "$ref": "#/$defs/printer_no_ppd_entry"
+                  }
+                },
+                "with_ppd": {
+                  "type": "array",
+                  "title": "With PPD Printers",
+                  "description": "Printers that require a PPD file.",
+                  "items": {
+                    "$ref": "#/$defs/printer_with_ppd_entry"
+                  }
+                },
+                "princh": {
+                  "type": "array",
+                  "title": "Princh Printers",
+                  "description": "Princh printer configurations.",
+                  "items": {
+                    "$ref": "#/$defs/printer_princh_entry"
+                  }
+                }
               }
             }
           }

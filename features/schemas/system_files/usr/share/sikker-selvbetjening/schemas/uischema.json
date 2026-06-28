@@ -13,16 +13,29 @@
       },
       "printer": {
         "printers": {
-          "items": {
-            "oneOf": [
-              {},
-              {
-                "ppd_file": {
-                  "ui:widget": "file"
-                }
+          "no_ppd": {
+            "items": {
+              "printer-type": {
+                "ui:widget": "hidden"
+              }
+            }
+          },
+          "with_ppd": {
+            "items": {
+              "printer-type": {
+                "ui:widget": "hidden"
               },
-              {}
-            ]
+              "ppd_file": {
+                "ui:widget": "file"
+              }
+            }
+          },
+          "princh": {
+            "items": {
+              "printer-type": {
+                "ui:widget": "hidden"
+              }
+            }
           }
         }
       },

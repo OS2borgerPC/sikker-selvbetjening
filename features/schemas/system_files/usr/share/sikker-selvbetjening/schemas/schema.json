@@ -128,22 +128,10 @@
           "properties": {
             "printers": {
               "type": "array",
-              "description": "List of printers with printer-type-specific settings and one default printer.",
-              "minItems": 1,
+              "description": "List of printers. You can add zero, one, or more printers of type no_ppd, with_ppd, and princh.",
               "items": {
                 "$ref": "#/$defs/printer_entry"
-              },
-              "contains": {
-                "type": "object",
-                "required": ["is_default"],
-                "properties": {
-                  "is_default": {
-                    "const": true
-                  }
-                }
-              },
-              "minContains": 1,
-              "maxContains": 1
+              }
             }
           }
         },
@@ -257,12 +245,15 @@
     "printer_entry": {
       "oneOf": [
         {
+          "title": "No PPD printer",
           "$ref": "#/$defs/printer_no_ppd_entry"
         },
         {
+          "title": "With PPD printer",
           "$ref": "#/$defs/printer_with_ppd_entry"
         },
         {
+          "title": "Princh printer",
           "$ref": "#/$defs/printer_princh_entry"
         }
       ]
@@ -271,7 +262,7 @@
       "type": "object",
       "description": "Printer entry that does not require a PPD file.",
       "additionalProperties": false,
-      "required": ["printer-type", "name", "display_name", "ip", "is_default"],
+      "required": ["printer-type", "name", "display_name", "ip"],
       "properties": {
         "printer-type": {
           "const": "no_ppd"
@@ -306,7 +297,7 @@
         },
         "is_default": {
           "type": "boolean",
-          "description": "Marks whether this printer is the default choice. Exactly one printer must be true per policy."
+          "description": "Optional legacy flag. Currently not enforced by schema."
         }
       }
     },
@@ -314,7 +305,7 @@
       "type": "object",
       "description": "Printer entry that requires a PPD file.",
       "additionalProperties": false,
-      "required": ["printer-type", "name", "display_name", "ip", "ppd_file", "is_default"],
+      "required": ["printer-type", "name", "display_name", "ip", "ppd_file"],
       "properties": {
         "printer-type": {
           "const": "with_ppd"
@@ -353,7 +344,7 @@
         },
         "is_default": {
           "type": "boolean",
-          "description": "Marks whether this printer is the default choice. Exactly one printer must be true per policy."
+          "description": "Optional legacy flag. Currently not enforced by schema."
         }
       }
     },
@@ -361,7 +352,7 @@
       "type": "object",
       "description": "Princh printer entry.",
       "additionalProperties": false,
-      "required": ["printer-type", "name", "display_name", "id", "is_default"],
+      "required": ["printer-type", "name", "display_name", "id"],
       "properties": {
         "printer-type": {
           "const": "princh"
@@ -390,7 +381,7 @@
         },
         "is_default": {
           "type": "boolean",
-          "description": "Marks whether this printer is the default choice. Exactly one printer must be true per policy."
+          "description": "Optional legacy flag. Currently not enforced by schema."
         }
       }
     },

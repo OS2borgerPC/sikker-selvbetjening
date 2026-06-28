@@ -218,8 +218,8 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Stable device group identifier used for cross-references.",
-          "pattern": "^(mesh/[^\\s/]+/[^\\s/]+|[a-z][a-z0-9_-]*)$",
+          "description": "Device group identifier used for cross-references. Can be a MeshCentral mesh id or any other identifier format.",
+          "pattern": ".*\\S.*",
           "minLength": 1
         },
         "name": {

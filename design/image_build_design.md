@@ -97,7 +97,7 @@ flowchart TB
     CIPipeline -- "(6) pushes updated Image Build to" --> ImageRegistry
     CIPipeline -- "(7) requests signing of updated Image Build in" --> ImageRegistry
     CIPipeline -- "(8) generates" --> SBOM
-    CIPipeline -- "(9) generates" --> OSDiskImage
+    CIPipeline -. "(9) generates" .-> OSDiskImage
 ```
 
 ## Explanations
@@ -177,6 +177,7 @@ Design Notes regarding the Signing Key/Secrets storage:
 
 Design Notes regarding the Disk Image Store:
 - As far as the implementation of the Disk Image Store is concerned, this does not need to be a separate software system. For example, VCS systems usually support attaching files to a repository as part of a "release".
+- The building of the Disk Image is currently designed as a concern of the Local Context, but in the likely case that the Domain Context builds its own images, it is strongly worth considering moving Disk Image Builds to the Domain Context. This will save on the Local Administration's resources, and running `bootc switch` from a base image will likely result in a stable install.
 
 ### Note 9
 

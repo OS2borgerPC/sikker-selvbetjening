@@ -197,3 +197,5 @@ Design Notes:
 ### Note 10
 
 Design Note: The "Observability Panel" is meant to be used by the Local Administrator role without technical training. It is meant to be an interface that informs the Local Administrator about the health of machines, and the status of rollouts, and potentially other information that is discovered to be relevant during development.
+
+Furthermore, there is a possibility that Local Administrators will expect to be able to manipulate running Client PCs. At this time, an evauation of potentially required components to support this feature is out of scope of this document.

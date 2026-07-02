@@ -1,8 +1,12 @@
-Document Context: **What?** This document outlines the design principles that we will follow during the implementation of the Build Pipeline for this project. **Why?** This document has been created during the prototyping phase for this project. We need to understand how to create Image Builds that can be shown during the prototype presentation. We also want to ensure that some of the logic we are creating can be re-used during the actual implementation phase, and that we are not encoding architectural patterns into the pipeline that we will later come to regret.
+## Design principles for the build pipeline
+
+This document has been created during the prototyping phase for this project. 
+
+We need to understand how to create Image Builds that can be shown during the prototype presentation. We also want to ensure that some of the logic we are creating can be re-used during the actual implementation phase, and that we are not encoding architectural patterns into the pipeline that we will later come to regret.
 
 ---
 
-# Language
+## Language
 
 Throughout the following document, we use this ubiquitous language:
 - Local Configuration: The non-sensitive part of the configuration, based on which properties of a local Image Build are set.
@@ -12,11 +16,11 @@ Throughout the following document, we use this ubiquitous language:
 - Image Declaration: The recipe/declaration that describes how an Image Build is produced.
 - Disk Image: A file that is used to install an operating system onto a computer, like an ISO file or a file used for PXE booting.
 
-# Prototype Build Flow
+## Prototype Build Flow
 
 The prototype build flow is explained in a separate document [./image_build_prototype.md].
 
-This flow is a subset of an envisioned build flow covers more production needs, and to explain the decisions that underlie this prototype flow, we present them in the context of such a more complete flow.
+This flow is a subset of an envisioned build flow that covers more production needs. It explains the decisions that underlie this prototype flow, we present them in the context of such a more complete flow.
 
 # Envisioned Build Flow
 
@@ -177,7 +181,7 @@ Design Notes regarding the Signing Key/Secrets storage:
 
 Design Notes regarding the Disk Image Store:
 - As far as the implementation of the Disk Image Store is concerned, this does not need to be a separate software system. For example, VCS systems usually support attaching files to a repository as part of a "release".
-- The building of the Disk Image is currently designed as a concern of the Local Context, but in the likely case that the Domain Context builds its own images, it is strongly worth considering moving Disk Image Builds to the Domain Context. This will save on the Local Administration's resources, and running `bootc switch` from a base image will likely result in a stable install.
+- The building of the Disk Image is currently designed as a concern of the Domain Context that builds its own images. This will save on the Local Administration's resources, and running `bootc switch` from a base image will likely result in a stable install.
 
 ### Note 9
 

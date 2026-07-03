@@ -1,29 +1,17 @@
 {
-  "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "./schema.json",
-  "title": "Sikker Selvbetjening Combined Config",
-  "description": "Single configuration schema that holds both policies and device_groups per domain.",
-  "type": "object",
-  "additionalProperties": false,
-  "required": ["domains"],
-  "properties": {
-    "domains": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "$ref": "#/$defs/domain_entry"
-      }
-    }
-  },
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "./policy.json",
+  "title": "Sikker Selvbetjening Policy Config",
+  "description": "Schema for a single policy configuration.",
+  "$ref": "#/$defs/policy_entry",
   "$defs": {
     "asset_file_base": {
       "type": "string",
-      "pattern": "^config/assets/[a-z][a-z0-9_-]*/.+",
-      "description": "Asset path under config/assets/<domain>/...",
+      "pattern": "^(?:\\.\\./assets|assets)/.+",
+      "description": "Relative asset path under assets/... (for example ../assets/bg-default.jpg).",
       "x-ssb-file": {
         "enabled": true,
-        "assetPrefixTemplate": "config/assets/{domain}/",
-        "downloadUrlTemplate": "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}"
+        "assetPrefixTemplate": "../assets/"
       }
     },
     "asset_file_image": {
@@ -36,8 +24,7 @@
       "x-ssb-file": {
         "enabled": true,
         "accept": "image/*",
-        "assetPrefixTemplate": "config/assets/{domain}/",
-        "downloadUrlTemplate": "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}"
+        "assetPrefixTemplate": "../assets/"
       }
     },
     "asset_file_ppd": {
@@ -50,36 +37,7 @@
       "x-ssb-file": {
         "enabled": true,
         "accept": ".ppd,text/plain,application/octet-stream",
-        "assetPrefixTemplate": "config/assets/{domain}/",
-        "downloadUrlTemplate": "https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{path}"
-      }
-    },
-    "domain_entry": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["domain", "policies", "device_groups"],
-      "properties": {
-        "domain": {
-          "type": "string",
-          "description": "Owning domain for the enclosed configuration.",
-          "pattern": "^[a-z][a-z0-9_-]*$",
-          "minLength": 1
-        },
-        "policies": {
-          "type": "array",
-          "description": "List of configuration policies for this domain.",
-          "minItems": 1,
-          "items": {
-            "$ref": "#/$defs/policy_entry"
-          }
-        },
-        "device_groups": {
-          "type": "array",
-          "description": "List of device group definitions for this domain.",
-          "items": {
-            "$ref": "#/$defs/device_group_entry"
-          }
-        }
+        "assetPrefixTemplate": "../assets/"
       }
     },
     "policy_entry": {
@@ -108,7 +66,7 @@
           "properties": {
             "background_image_file": {
               "$ref": "#/$defs/asset_file_image",
-              "description": "Asset path for the desktop background image. Values starting with config/assets/ are treated as file paths under config/assets."
+              "description": "Asset path for the desktop background image, typically as a relative path such as ../assets/bg-default.jpg."
             },
             "shortcuts_in_menu": {
               "type": "array",
@@ -193,7 +151,7 @@
             }
           }
         },
-        "firefox_urls": {
+        "firefox": {
           "type": "object",
           "additionalProperties": false,
           "properties": {
@@ -223,65 +181,6 @@
           }
         }
       }
-    },
-    "device_group_entry": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["id", "name", "policies", "image_name"],
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Device group identifier used for cross-references. Can be a MeshCentral mesh id or any other identifier format.",
-          "pattern": ".*\\S.*",
-          "minLength": 1
-        },
-        "name": {
-          "type": "string",
-          "title": "Device Group Name",
-          "minLength": 1
-        },
-        "description": {
-          "type": "string",
-          "title": "Description",
-          "description": "Optional description of the device group",
-          "minLength": 1
-        },
-        "policies": {
-          "type": "array",
-          "title": "Policies",
-          "description": "List of policy IDs assigned to this device group.",
-          "minItems": 1,
-          "items": {
-            "type": "string",
-            "title": "Policy ID",
-            "pattern": "^[a-z][a-z0-9_-]*$",
-            "minLength": 1
-          },
-          "uniqueItems": true
-        },
-        "image_name": {
-          "type": "string",
-          "title": "Image Name",
-          "description": "Identifier-safe image key for automation.",
-          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
-        }
-      }
-    },
-    "printer_entry": {
-      "oneOf": [
-        {
-          "title": "No PPD printer",
-          "$ref": "#/$defs/printer_no_ppd_entry"
-        },
-        {
-          "title": "With PPD printer",
-          "$ref": "#/$defs/printer_with_ppd_entry"
-        },
-        {
-          "title": "Princh printer",
-          "$ref": "#/$defs/printer_princh_entry"
-        }
-      ]
     },
     "printer_no_ppd_entry": {
       "type": "object",
@@ -391,7 +290,7 @@
         },
         "ppd_file": {
           "$ref": "#/$defs/asset_file_ppd",
-          "description": "Asset path to a PPD file. Values starting with config/assets/ are treated as file paths under config/assets."
+          "description": "Relative asset path to a PPD file, typically under ../assets/."
         },
         "is_default": {
           "type": "boolean",

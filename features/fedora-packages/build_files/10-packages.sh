@@ -12,6 +12,7 @@ dnf5 install -y \
 	libreoffice \
     libreoffice-langpack-da \
 	ansible \
+	jq \
 	python3-jsonschema \
 	python3-pyyaml \
 	grubby \

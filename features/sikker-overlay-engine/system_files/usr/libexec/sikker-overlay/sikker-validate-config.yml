@@ -148,3 +148,81 @@
       loop_control:
         label: "{{ item }}"
       changed_when: false
+
+    - name: Ensure merged policy output directory exists
+      ansible.builtin.file:
+        path: "{{ (merged_policy_file | default('/tmp/merged-policy.json')) | dirname }}"
+        state: directory
+        mode: "0755"
+
+    - name: Create merged policy file
+      ansible.builtin.shell: |
+        tmpdir="$(mktemp -d)"
+        cleanup() {
+          rm -rf "${tmpdir}"
+        }
+        trap cleanup EXIT
+
+        python3 - <<'PY' > "${tmpdir}/resolved_policy_paths.json"
+        import json
+        import os
+
+        policies = json.loads(os.environ["POLICIES_JSON"])
+        policies_root = os.environ["POLICIES_ROOT"]
+
+        resolved = []
+        for item in policies:
+            if item.startswith("/"):
+                resolved.append(item)
+            elif item.startswith("../policies/"):
+                resolved.append(os.path.join(policies_root, item[len("../policies/"):]))
+            elif item.startswith("policies/"):
+                resolved.append(os.path.join(policies_root, item[len("policies/"):]))
+            else:
+                resolved.append(os.path.join(policies_root, item))
+
+        print(json.dumps(resolved))
+        PY
+
+        mapfile -t resolved_policy_paths < <(jq -r '.[]' "${tmpdir}/resolved_policy_paths.json")
+
+        if [[ "${#resolved_policy_paths[@]}" -eq 0 ]]; then
+          echo "No policy files resolved for merge" >&2
+          exit 1
+        fi
+
+        json_policy_files=()
+        index=0
+        for policy_path in "${resolved_policy_paths[@]}"; do
+          json_file="${tmpdir}/policy-${index}.json"
+          python3 - <<'PY' "${policy_path}" > "${json_file}"
+        import json
+        import sys
+        import yaml
+
+        with open(sys.argv[1], "r", encoding="utf-8") as handle:
+          payload = yaml.safe_load(handle)
+
+        if payload is None:
+          payload = {}
+        elif not isinstance(payload, dict):
+          raise SystemExit(f"Policy file must contain a YAML mapping at the top level: {sys.argv[1]}")
+
+        print(json.dumps(payload))
+        PY
+          json_policy_files+=("${json_file}")
+          index=$((index + 1))
+        done
+
+        jq -s 'reduce .[] as $item ({}; . * $item)' "${json_policy_files[@]}" > "${MERGED_POLICY_FILE}"
+      args:
+        executable: /bin/bash
+      environment:
+        POLICIES_JSON: "{{ imageconfig_payload.policies | to_json }}"
+        POLICIES_ROOT: "{{ policies_root }}"
+        MERGED_POLICY_FILE: "{{ merged_policy_file | default('/tmp/merged-policy.json') }}"
+      changed_when: true
+
+    - name: Report merged policy file location
+      ansible.builtin.debug:
+        msg: "Merged policy file created at {{ merged_policy_file | default('/tmp/merged-policy.json') }}"

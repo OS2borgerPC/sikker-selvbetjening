@@ -16,6 +16,7 @@ ANSIBLE_CONFIG_FILE="${OVERLAY_PLAYBOOK_ROOT}/ansible.cfg"
 SCHEMA_ROOT="${SIKKER_SCHEMA_DIR:-/usr/share/sikker-selvbetjening/schemas}"
 IMAGECONFIG_SCHEMA_FILE="${SCHEMA_ROOT}/imageconfig.json"
 POLICY_SCHEMA_FILE="${SCHEMA_ROOT}/policy.json"
+MERGED_POLICY_FILE="${SIKKER_MERGED_POLICY_FILE:-/tmp/$(basename "${IMAGECONFIG_FILE%.*}").merged-policy.json}"
 
 [[ -f "${IMAGECONFIG_FILE}" ]] || die "Missing imageconfig file: ${IMAGECONFIG_FILE}"
 [[ -d "${POLICIES_ROOT}" ]] || die "Missing policies root directory: ${POLICIES_ROOT}"
@@ -25,6 +26,7 @@ POLICY_SCHEMA_FILE="${SCHEMA_ROOT}/policy.json"
 [[ -f "${POLICY_SCHEMA_FILE}" ]] || die "Missing policy schema: ${POLICY_SCHEMA_FILE}"
 command -v ansible-playbook >/dev/null 2>&1 || die "ansible-playbook is not installed"
 command -v python3 >/dev/null 2>&1 || die "python3 is not installed"
+command -v jq >/dev/null 2>&1 || die "jq is not installed"
 
 export ANSIBLE_CONFIG="${ANSIBLE_CONFIG_FILE}"
 export ANSIBLE_NOCOWS=1
@@ -35,5 +37,6 @@ ansible-playbook \
 	"${PLAYBOOK_FILE}" \
 	--extra-vars "imageconfig_file=${IMAGECONFIG_FILE}" \
 	--extra-vars "policies_root=${POLICIES_ROOT}" \
+	--extra-vars "merged_policy_file=${MERGED_POLICY_FILE}" \
 	--extra-vars "imageconfig_schema_file=${IMAGECONFIG_SCHEMA_FILE}" \
 	--extra-vars "policy_schema_file=${POLICY_SCHEMA_FILE}"

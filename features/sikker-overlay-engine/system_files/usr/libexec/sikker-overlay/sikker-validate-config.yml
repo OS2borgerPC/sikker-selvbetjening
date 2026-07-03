@@ -1,0 +1,150 @@
+---
+- name: Validate imageconfig and policy files
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Ensure required input vars are provided
+      ansible.builtin.assert:
+        that:
+          - imageconfig_file is defined
+          - policies_root is defined
+          - imageconfig_schema_file is defined
+          - policy_schema_file is defined
+        fail_msg: "Required vars: imageconfig_file, policies_root, imageconfig_schema_file, policy_schema_file"
+
+    - name: Ensure imageconfig file exists
+      ansible.builtin.stat:
+        path: "{{ imageconfig_file }}"
+      register: imageconfig_stat
+
+    - name: Ensure policies root exists
+      ansible.builtin.stat:
+        path: "{{ policies_root }}"
+      register: policies_root_stat
+
+    - name: Ensure schema files exist
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      loop:
+        - "{{ imageconfig_schema_file }}"
+        - "{{ policy_schema_file }}"
+      register: schema_stats
+
+    - name: Validate required paths exist
+      ansible.builtin.assert:
+        that:
+          - imageconfig_stat.stat.exists
+          - imageconfig_stat.stat.isreg
+          - policies_root_stat.stat.exists
+          - policies_root_stat.stat.isdir
+          - (schema_stats.results | map(attribute='stat.exists') | list | min)
+        fail_msg: "Missing required input file/directory/schema path"
+
+    - name: Read imageconfig payload
+      ansible.builtin.slurp:
+        src: "{{ imageconfig_file }}"
+      register: imageconfig_raw
+
+    - name: Parse imageconfig YAML payload
+      ansible.builtin.set_fact:
+        imageconfig_payload: "{{ imageconfig_raw.content | b64decode | from_yaml }}"
+
+    - name: Validate imageconfig against schema
+      ansible.builtin.shell: |
+        python3 - <<'PY'
+        import json
+        import os
+        import sys
+
+        try:
+            import jsonschema
+        except Exception as exc:
+            print(f"python3-jsonschema is required: {exc}")
+            sys.exit(2)
+
+        schema_path = os.environ["SCHEMA_PATH"]
+        instance = json.loads(os.environ["INSTANCE_JSON"])
+
+        with open(schema_path, "r", encoding="utf-8") as handle:
+            schema = json.load(handle)
+
+        validator = jsonschema.Draft7Validator(schema)
+        errors = sorted(validator.iter_errors(instance), key=lambda err: err.path)
+        if errors:
+            print("Imageconfig schema validation failed:")
+            for err in errors:
+                path = ".".join([str(p) for p in err.absolute_path])
+                print(f"- {path or '$'}: {err.message}")
+            sys.exit(1)
+
+        print("Imageconfig schema validation passed")
+        PY
+      args:
+        executable: /bin/bash
+      environment:
+        SCHEMA_PATH: "{{ imageconfig_schema_file }}"
+        INSTANCE_JSON: "{{ imageconfig_payload | to_json }}"
+      changed_when: false
+
+    - name: Ensure imageconfig includes policies array
+      ansible.builtin.assert:
+        that:
+          - imageconfig_payload.policies is sequence
+          - imageconfig_payload.policies | length > 0
+        fail_msg: "imageconfig must include a non-empty policies array"
+
+    - name: Validate policy files referenced by imageconfig
+      vars:
+        resolved_policy_file: >-
+          {{ item if (item is match('^/'))
+          else policies_root ~ '/' ~ (item | regex_replace('^(\.\./policies/|policies/)', '')) }}
+      ansible.builtin.shell: |
+        python3 - <<'PY'
+        import json
+        import os
+        import sys
+
+        try:
+            import jsonschema
+            import yaml
+        except Exception as exc:
+            print(f"Required Python module missing: {exc}")
+            sys.exit(2)
+
+        schema_path = os.environ["SCHEMA_PATH"]
+        policy_path = os.environ["POLICY_PATH"]
+        source_label = os.environ["SOURCE_LABEL"]
+
+        if not os.path.isfile(policy_path):
+            print(f"Referenced policy file not found: {source_label} -> {policy_path}")
+            sys.exit(1)
+
+        with open(policy_path, "r", encoding="utf-8") as handle:
+            instance = yaml.safe_load(handle)
+
+        with open(schema_path, "r", encoding="utf-8") as handle:
+            schema = json.load(handle)
+
+        validator = jsonschema.Draft7Validator(schema)
+        errors = sorted(validator.iter_errors(instance), key=lambda err: err.path)
+        if errors:
+            print(f"Policy schema validation failed for {source_label}:")
+            for err in errors:
+                path = ".".join([str(p) for p in err.absolute_path])
+                print(f"- {path or '$'}: {err.message}")
+            sys.exit(1)
+
+        print(f"Policy schema validation passed for {source_label}")
+        PY
+      args:
+        executable: /bin/bash
+      environment:
+        SCHEMA_PATH: "{{ policy_schema_file }}"
+        POLICY_PATH: "{{ resolved_policy_file }}"
+        SOURCE_LABEL: "{{ item }}"
+      loop: "{{ imageconfig_payload.policies }}"
+      loop_control:
+        label: "{{ item }}"
+      changed_when: false

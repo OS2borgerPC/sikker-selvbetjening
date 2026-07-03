@@ -12,6 +12,8 @@ dnf5 install -y \
 	libreoffice \
     libreoffice-langpack-da \
 	ansible \
+	python3-jsonschema \
+	python3-pyyaml \
 	grubby \
 	zenity 
 # Use a COPR Example:

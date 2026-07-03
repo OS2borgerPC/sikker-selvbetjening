@@ -1,9 +1,9 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "./image.json",
-  "title": "Sikker Selvbetjening Image Config",
-  "description": "Schema for a single image configuration.",
-  "$ref": "#/$defs/image_entry",
+  "$id": "./imageconfig.json",
+  "title": "Sikker Selvbetjening ImageConfig Config",
+  "description": "Schema for a single imageconfig configuration.",
+  "$ref": "#/$defs/imageconfig_entry",
   "$defs": {
     "policy_file_base": {
       "type": "string",
@@ -14,7 +14,7 @@
         "assetPrefixTemplate": "../policies/"
       }
     },
-    "image_entry": {
+    "imageconfig_entry": {
       "type": "object",
       "additionalProperties": false,
       "required": ["name", "policies", "image_id"],
@@ -27,13 +27,13 @@
         "description": {
           "type": "string",
           "title": "Description",
-          "description": "Optional description of the image",
+          "description": "Optional description of the imageconfig",
           "minLength": 1
         },
         "policies": {
           "type": "array",
           "title": "Policies",
-          "description": "List of relative policy file paths assigned to this image.",
+          "description": "List of relative policy file paths assigned to this imageconfig.",
           "minItems": 1,
           "items": {
             "$ref": "#/$defs/policy_file_base"

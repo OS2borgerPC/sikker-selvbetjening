@@ -237,6 +237,17 @@
         state: directory
         mode: "0755"
 
+    - name: Initialize post-steps configuration
+      ansible.builtin.copy:
+        dest: "{{ output_root | default('/tmp/sikker-overlay-output') }}/post-steps.json"
+        mode: "0644"
+        force: false
+        content: |
+          {
+            "version": 1,
+            "steps": []
+          }
+
     - name: Discover overlay task files
       ansible.builtin.find:
         paths: "{{ playbook_dir }}/tasks"

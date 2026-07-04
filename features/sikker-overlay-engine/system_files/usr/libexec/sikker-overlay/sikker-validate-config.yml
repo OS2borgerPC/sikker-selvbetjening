@@ -234,3 +234,27 @@
     - name: Report merged policy file location
       ansible.builtin.debug:
         msg: "Merged policy file created at {{ merged_policy_file | default('/tmp/merged-policy.json') }}"
+
+    - name: Load merged policy configuration
+      ansible.builtin.include_vars:
+        file: "{{ merged_policy_file | default('/tmp/merged-policy.json') }}"
+
+    - name: Ensure overlay output root exists
+      ansible.builtin.file:
+        path: "{{ output_root | default('/tmp/sikker-overlay-output') }}"
+        state: directory
+        mode: "0755"
+
+    - name: Discover overlay task files
+      ansible.builtin.find:
+        paths: "{{ playbook_dir }}/tasks"
+        patterns: "*.yml"
+        file_type: file
+        recurse: false
+      register: overlay_domain_task_files
+
+    - name: Render overlay tasks
+      ansible.builtin.include_tasks: "{{ item.path }}"
+      loop: "{{ overlay_domain_task_files.files | sort(attribute='path') }}"
+      loop_control:
+        label: "{{ item.path | basename }}"

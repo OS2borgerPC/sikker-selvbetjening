@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Validates imageconfig and referenced policy YAML files against JSON schemas.
+# Validates imageconfig and referenced policy YAML files, then renders overlay tasks.
 # Expects: imageconfig file, policies root directory, and assets root directory.
+# Optional 4th arg: output root (default: /tmp/sikker-overlay-output).
 set -euo pipefail
 
 die() {
@@ -11,6 +12,7 @@ die() {
 IMAGECONFIG_FILE="${1:?imageconfig file required}"
 POLICIES_ROOT="${2:?policies root required}"
 ASSETS_ROOT="${3:?assets root required}"
+OUTPUT_ROOT="${4:-${SIKKER_OUTPUT_ROOT:-/tmp/sikker-overlay-output}}"
 OVERLAY_PLAYBOOK_ROOT="${SIKKER_OVERLAY_PLAYBOOK_DIR:-/usr/libexec/sikker-overlay}"
 PLAYBOOK_FILE="${OVERLAY_PLAYBOOK_ROOT}/sikker-validate-config.yml"
 ANSIBLE_CONFIG_FILE="${OVERLAY_PLAYBOOK_ROOT}/ansible.cfg"
@@ -40,6 +42,7 @@ ansible-playbook \
 	--extra-vars "imageconfig_file=${IMAGECONFIG_FILE}" \
 	--extra-vars "policies_root=${POLICIES_ROOT}" \
 	--extra-vars "assets_root=${ASSETS_ROOT}" \
+	--extra-vars "output_root=${OUTPUT_ROOT}" \
 	--extra-vars "merged_policy_file=${MERGED_POLICY_FILE}" \
 	--extra-vars "imageconfig_schema_file=${IMAGECONFIG_SCHEMA_FILE}" \
 	--extra-vars "policy_schema_file=${POLICY_SCHEMA_FILE}"

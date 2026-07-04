@@ -222,9 +222,14 @@
       ansible.builtin.set_fact:
         merged_policy: "{{ merge_result.stdout | from_json }}"
 
+    - name: Promote merged policy keys to top-level vars
+      ansible.builtin.set_fact:
+        "{{ item.key }}": "{{ item.value }}"
+      loop: "{{ merged_policy | dict2items }}"
+
     - name: Output merged policy contents
       ansible.builtin.debug:
-        msg: "{{ merged_policy | to_nice_json }}"
+        var: merged_policy
 
     - name: Ensure overlay output root exists
       ansible.builtin.file:

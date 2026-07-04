@@ -13,6 +13,12 @@
       ansible.builtin.set_fact:
         background_image_asset_relpath: "{{ background_image_file | overlay_asset_relpath }}"
 
+    - name: Report desktop background copy paths
+      ansible.builtin.debug:
+        msg:
+          - "Background source: {{ assets_root }}/{{ background_image_asset_relpath }}"
+          - "Background destination: {{ output_root }}/{{ background_image_relpath }}"
+
     - name: Ensure background directory exists
       ansible.builtin.file:
         path: "{{ output_root }}/usr/share/backgrounds/sikker-selvbetjening"

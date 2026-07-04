@@ -10,9 +10,10 @@
         that:
           - imageconfig_file is defined
           - policies_root is defined
+          - assets_root is defined
           - imageconfig_schema_file is defined
           - policy_schema_file is defined
-        fail_msg: "Required vars: imageconfig_file, policies_root, imageconfig_schema_file, policy_schema_file"
+        fail_msg: "Required vars: imageconfig_file, policies_root, assets_root, imageconfig_schema_file, policy_schema_file"
 
     - name: Ensure imageconfig file exists
       ansible.builtin.stat:
@@ -23,6 +24,11 @@
       ansible.builtin.stat:
         path: "{{ policies_root }}"
       register: policies_root_stat
+
+    - name: Ensure assets root exists
+      ansible.builtin.stat:
+        path: "{{ assets_root }}"
+      register: assets_root_stat
 
     - name: Ensure schema files exist
       ansible.builtin.stat:
@@ -39,6 +45,8 @@
           - imageconfig_stat.stat.isreg
           - policies_root_stat.stat.exists
           - policies_root_stat.stat.isdir
+          - assets_root_stat.stat.exists
+          - assets_root_stat.stat.isdir
           - (schema_stats.results | map(attribute='stat.exists') | list | min)
         fail_msg: "Missing required input file/directory/schema path"
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Validates imageconfig and referenced policy YAML files against JSON schemas.
-# Expects: imageconfig file and policies root directory.
+# Expects: imageconfig file, policies root directory, and assets root directory.
 set -euo pipefail
 
 die() {
@@ -10,6 +10,7 @@ die() {
 
 IMAGECONFIG_FILE="${1:?imageconfig file required}"
 POLICIES_ROOT="${2:?policies root required}"
+ASSETS_ROOT="${3:?assets root required}"
 OVERLAY_PLAYBOOK_ROOT="${SIKKER_OVERLAY_PLAYBOOK_DIR:-/usr/libexec/sikker-overlay}"
 PLAYBOOK_FILE="${OVERLAY_PLAYBOOK_ROOT}/sikker-validate-config.yml"
 ANSIBLE_CONFIG_FILE="${OVERLAY_PLAYBOOK_ROOT}/ansible.cfg"
@@ -20,6 +21,7 @@ MERGED_POLICY_FILE="${SIKKER_MERGED_POLICY_FILE:-/tmp/$(basename "${IMAGECONFIG_
 
 [[ -f "${IMAGECONFIG_FILE}" ]] || die "Missing imageconfig file: ${IMAGECONFIG_FILE}"
 [[ -d "${POLICIES_ROOT}" ]] || die "Missing policies root directory: ${POLICIES_ROOT}"
+[[ -d "${ASSETS_ROOT}" ]] || die "Missing assets root directory: ${ASSETS_ROOT}"
 [[ -d "${OVERLAY_PLAYBOOK_ROOT}" ]] || die "Missing overlay playbook directory: ${OVERLAY_PLAYBOOK_ROOT}"
 [[ -f "${PLAYBOOK_FILE}" ]] || die "Missing validation playbook: ${PLAYBOOK_FILE}"
 [[ -f "${IMAGECONFIG_SCHEMA_FILE}" ]] || die "Missing imageconfig schema: ${IMAGECONFIG_SCHEMA_FILE}"
@@ -37,6 +39,7 @@ ansible-playbook \
 	"${PLAYBOOK_FILE}" \
 	--extra-vars "imageconfig_file=${IMAGECONFIG_FILE}" \
 	--extra-vars "policies_root=${POLICIES_ROOT}" \
+	--extra-vars "assets_root=${ASSETS_ROOT}" \
 	--extra-vars "merged_policy_file=${MERGED_POLICY_FILE}" \
 	--extra-vars "imageconfig_schema_file=${IMAGECONFIG_SCHEMA_FILE}" \
 	--extra-vars "policy_schema_file=${POLICY_SCHEMA_FILE}"

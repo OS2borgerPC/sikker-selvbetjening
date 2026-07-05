@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Build and publish one image by validating config, rendering overlay files,
-# running podman build, and pushing derived tags.
+# Build one image by validating config, rendering overlay files,
+# running podman build, and creating derived local tags.
 #
 # Required positional arguments:
 #   1) imageconfig_file   Path to imageconfig YAML file.
@@ -21,7 +21,7 @@
 #   1) Validate imageconfig and referenced policy files.
 #   2) Render overlay content into the staging output root.
 #   3) Build target_image_ref from BASE_IMAGE with staged /usr and /etc content.
-#   4) Push target_image_ref plus date/sha-derived tags.
+#   4) Create date/sha-derived local tags and print them for caller-side push.
 set -euo pipefail
 
 die() {
@@ -102,6 +102,7 @@ if [[ -n "${SHA_TAG}" ]]; then
 fi
 
 declare -A seen_tags=()
+resolved_push_refs=()
 for tag in "${TAGS[@]}"; do
 	if [[ -n "${seen_tags[${tag}]:-}" ]]; then
 		continue
@@ -112,7 +113,11 @@ for tag in "${TAGS[@]}"; do
 	if [[ "${tag}" != "${PRIMARY_TAG}" ]]; then
 		podman tag "${TARGET_IMAGE_REF}" "${target_ref}"
 	fi
-
-	echo "Pushing image: ${target_ref}"
-	podman push "${target_ref}"
+	resolved_push_refs+=("${target_ref}")
 done
+
+echo "PUSH_REFS_BEGIN"
+for ref in "${resolved_push_refs[@]}"; do
+	echo "${ref}"
+done
+echo "PUSH_REFS_END"

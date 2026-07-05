@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Build one image by validating config, rendering overlay files, and running podman build.
+# Build and publish one image by validating config, rendering overlay files,
+# running podman build, and pushing derived tags.
 #
 # Required positional arguments:
 #   1) imageconfig_file   Path to imageconfig YAML file.
@@ -14,11 +15,13 @@
 #   SIKKER_OUTPUT_ROOT        Staging output directory (default: /tmp/sikker-overlay-output)
 #   SIKKER_OVERLAY_PLAYBOOK_DIR  Overlay playbook directory (default: /usr/libexec/sikker-overlay)
 #   SIKKER_SCHEMA_DIR         JSON schema directory (default: /usr/share/sikker-selvbetjening/schemas)
+#   GITHUB_SHA                Commit SHA used to derive an immutable sha-* tag.
 #
 # Flow:
 #   1) Validate imageconfig and referenced policy files.
 #   2) Render overlay content into the staging output root.
 #   3) Build target_image_ref from BASE_IMAGE with staged /usr and /etc content.
+#   4) Push target_image_ref plus date/sha-derived tags.
 set -euo pipefail
 
 die() {
@@ -49,6 +52,7 @@ POLICY_SCHEMA_FILE="${SCHEMA_ROOT}/policy.json"
 command -v ansible-playbook >/dev/null 2>&1 || die "ansible-playbook is not installed"
 command -v python3 >/dev/null 2>&1 || die "python3 is not installed"
 command -v podman >/dev/null 2>&1 || die "podman is not installed"
+[[ "${TARGET_IMAGE_REF}" =~ .+/.+:.+ ]] || die "target_image_ref must include repository path and tag (example: ghcr.io/org/name:latest)"
 
 export ANSIBLE_CONFIG="${ANSIBLE_CONFIG_FILE}"
 export ANSIBLE_NOCOWS=1
@@ -76,3 +80,39 @@ COPY etc/ /etc/
 EOF
 
 echo "Built image: ${TARGET_IMAGE_REF}"
+
+IMAGE_REF_BASE="${TARGET_IMAGE_REF%:*}"
+PRIMARY_TAG="${TARGET_IMAGE_REF##*:}"
+DATE_TAG="$(date -u +%Y%m%d)"
+SHA_TAG=""
+
+if [[ -n "${GITHUB_SHA:-}" ]]; then
+	SHA_TAG="sha-${GITHUB_SHA:0:7}"
+fi
+
+TAGS=("${PRIMARY_TAG}")
+if [[ "${PRIMARY_TAG}" == "latest" ]]; then
+	TAGS+=("latest.${DATE_TAG}" "${DATE_TAG}")
+else
+	TAGS+=("${PRIMARY_TAG}.${DATE_TAG}" "${DATE_TAG}")
+fi
+
+if [[ -n "${SHA_TAG}" ]]; then
+	TAGS+=("${SHA_TAG}")
+fi
+
+declare -A seen_tags=()
+for tag in "${TAGS[@]}"; do
+	if [[ -n "${seen_tags[${tag}]:-}" ]]; then
+		continue
+	fi
+	seen_tags["${tag}"]=1
+
+	target_ref="${IMAGE_REF_BASE}:${tag}"
+	if [[ "${tag}" != "${PRIMARY_TAG}" ]]; then
+		podman tag "${TARGET_IMAGE_REF}" "${target_ref}"
+	fi
+
+	echo "Pushing image: ${target_ref}"
+	podman push "${target_ref}"
+done

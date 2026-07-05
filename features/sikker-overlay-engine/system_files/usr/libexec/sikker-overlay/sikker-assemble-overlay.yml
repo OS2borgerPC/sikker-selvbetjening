@@ -1,5 +1,5 @@
 ---
-- name: Validate imageconfig and policy files
+- name: Assemble overlay from imageconfig and policies
   hosts: localhost
   connection: local
   gather_facts: false

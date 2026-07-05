@@ -1,7 +1,24 @@
 #!/usr/bin/env bash
-# Validates imageconfig and referenced policy YAML files, then renders overlay tasks.
-# Expects: imageconfig file, policies root directory, and assets root directory.
-# Optional 4th arg: output root (default: /tmp/sikker-overlay-output).
+# Build one image by validating config, rendering overlay files, and running podman build.
+#
+# Required positional arguments:
+#   1) imageconfig_file   Path to imageconfig YAML file.
+#   2) policies_root      Directory containing policy YAML files.
+#   3) assets_root        Directory containing referenced assets.
+#   4) target_image_ref   Fully qualified image ref (example: ghcr.io/org/name:tag).
+#
+# Required environment variables:
+#   BASE_IMAGE            Base image used in the final build.
+#
+# Optional environment variables:
+#   SIKKER_OUTPUT_ROOT        Staging output directory (default: /tmp/sikker-overlay-output)
+#   SIKKER_OVERLAY_PLAYBOOK_DIR  Overlay playbook directory (default: /usr/libexec/sikker-overlay)
+#   SIKKER_SCHEMA_DIR         JSON schema directory (default: /usr/share/sikker-selvbetjening/schemas)
+#
+# Flow:
+#   1) Validate imageconfig and referenced policy files.
+#   2) Render overlay content into the staging output root.
+#   3) Build target_image_ref from BASE_IMAGE with staged /usr and /etc content.
 set -euo pipefail
 
 die() {
@@ -12,14 +29,15 @@ die() {
 IMAGECONFIG_FILE="${1:?imageconfig file required}"
 POLICIES_ROOT="${2:?policies root required}"
 ASSETS_ROOT="${3:?assets root required}"
-OUTPUT_ROOT="${4:-${SIKKER_OUTPUT_ROOT:-/tmp/sikker-overlay-output}}"
+TARGET_IMAGE_REF="${4:?target image ref required}"
+OUTPUT_ROOT="${SIKKER_OUTPUT_ROOT:-/tmp/sikker-overlay-output}"
+BASE_IMAGE="${BASE_IMAGE:?BASE_IMAGE must be set}"
 OVERLAY_PLAYBOOK_ROOT="${SIKKER_OVERLAY_PLAYBOOK_DIR:-/usr/libexec/sikker-overlay}"
 PLAYBOOK_FILE="${OVERLAY_PLAYBOOK_ROOT}/sikker-validate-config.yml"
 ANSIBLE_CONFIG_FILE="${OVERLAY_PLAYBOOK_ROOT}/ansible.cfg"
 SCHEMA_ROOT="${SIKKER_SCHEMA_DIR:-/usr/share/sikker-selvbetjening/schemas}"
 IMAGECONFIG_SCHEMA_FILE="${SCHEMA_ROOT}/imageconfig.json"
 POLICY_SCHEMA_FILE="${SCHEMA_ROOT}/policy.json"
-MERGED_POLICY_FILE="${SIKKER_MERGED_POLICY_FILE:-/tmp/$(basename "${IMAGECONFIG_FILE%.*}").merged-policy.json}"
 
 [[ -f "${IMAGECONFIG_FILE}" ]] || die "Missing imageconfig file: ${IMAGECONFIG_FILE}"
 [[ -d "${POLICIES_ROOT}" ]] || die "Missing policies root directory: ${POLICIES_ROOT}"
@@ -30,7 +48,7 @@ MERGED_POLICY_FILE="${SIKKER_MERGED_POLICY_FILE:-/tmp/$(basename "${IMAGECONFIG_
 [[ -f "${POLICY_SCHEMA_FILE}" ]] || die "Missing policy schema: ${POLICY_SCHEMA_FILE}"
 command -v ansible-playbook >/dev/null 2>&1 || die "ansible-playbook is not installed"
 command -v python3 >/dev/null 2>&1 || die "python3 is not installed"
-command -v jq >/dev/null 2>&1 || die "jq is not installed"
+command -v podman >/dev/null 2>&1 || die "podman is not installed"
 
 export ANSIBLE_CONFIG="${ANSIBLE_CONFIG_FILE}"
 export ANSIBLE_NOCOWS=1
@@ -43,6 +61,18 @@ ansible-playbook \
 	--extra-vars "policies_root=${POLICIES_ROOT}" \
 	--extra-vars "assets_root=${ASSETS_ROOT}" \
 	--extra-vars "output_root=${OUTPUT_ROOT}" \
-	--extra-vars "merged_policy_file=${MERGED_POLICY_FILE}" \
 	--extra-vars "imageconfig_schema_file=${IMAGECONFIG_SCHEMA_FILE}" \
 	--extra-vars "policy_schema_file=${POLICY_SCHEMA_FILE}"
+
+mkdir -p "${OUTPUT_ROOT}/usr" "${OUTPUT_ROOT}/etc"
+
+podman build \
+	-t "${TARGET_IMAGE_REF}" \
+	-f - \
+	"${OUTPUT_ROOT}" <<EOF
+FROM ${BASE_IMAGE}
+COPY usr/ /usr/
+COPY etc/ /etc/
+EOF
+
+echo "Built image: ${TARGET_IMAGE_REF}"

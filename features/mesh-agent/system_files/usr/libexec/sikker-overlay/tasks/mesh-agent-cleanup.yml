@@ -25,7 +25,7 @@
 
     - name: Read post-steps configuration
       ansible.builtin.slurp:
-        path: "{{ output_root }}/post-steps.json"
+        src: "{{ output_root }}/post-steps.json"
       register: post_steps_raw
 
     - name: Parse post-steps configuration

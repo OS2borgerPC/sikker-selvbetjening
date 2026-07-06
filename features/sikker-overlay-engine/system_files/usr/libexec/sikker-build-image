@@ -77,6 +77,11 @@ podman build \
 FROM ${BASE_IMAGE}
 COPY usr/ /usr/
 COPY etc/ /etc/
+COPY post-steps.json /tmp/sikker-post-steps.json
+RUN ANSIBLE_CONFIG=/usr/libexec/sikker-overlay/ansible.cfg ANSIBLE_NOCOWS=1 \
+    ansible-playbook /usr/libexec/sikker-overlay/sikker-run-post-steps.yml \
+    --extra-vars "post_steps_file=/tmp/sikker-post-steps.json" \
+    && rm -f /tmp/sikker-post-steps.json
 EOF
 
 echo "Built image: ${TARGET_IMAGE_REF}"

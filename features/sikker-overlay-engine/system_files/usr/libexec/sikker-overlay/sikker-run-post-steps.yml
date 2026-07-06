@@ -1,0 +1,46 @@
+---
+- name: Run generic post steps
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    post_steps_file: "{{ post_steps_file | default('/tmp/post-steps.json') }}"
+
+  tasks:
+    - name: Read post-steps file
+      ansible.builtin.slurp:
+        src: "{{ post_steps_file }}"
+      register: post_steps_raw
+
+    - name: Parse post-steps payload
+      ansible.builtin.set_fact:
+        post_steps_payload: "{{ post_steps_raw.content | b64decode | from_json }}"
+
+    - name: Validate envelope only
+      ansible.builtin.assert:
+        that:
+          - post_steps_payload.version == 1
+          - post_steps_payload.steps is sequence
+        fail_msg: "post-steps.json must contain version=1 and steps=array"
+
+    - name: Materialize steps
+      ansible.builtin.set_fact:
+        post_steps: "{{ post_steps_payload.steps | default([]) }}"
+
+    - name: Nothing to execute
+      ansible.builtin.debug:
+        msg: "No post steps defined; nothing to execute."
+      when: post_steps | length == 0
+
+    - name: Execute generic steps with command
+      ansible.builtin.command:
+        argv: "{{ [item.command] + (item.args | default([]) | map('string') | list) }}"
+        chdir: "{{ item.cwd | default(omit) }}"
+      environment: "{{ item.env | default({}) }}"
+      loop: "{{ post_steps }}"
+      when:
+        - post_steps | length > 0
+        - (item.command | default('')) | length > 0
+      loop_control:
+        label: "{{ item.action | default('run') }}: {{ item.command | default('<missing command>') }}"

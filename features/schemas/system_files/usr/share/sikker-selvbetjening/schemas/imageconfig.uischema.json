@@ -1,0 +1,34 @@
+{
+  "ui:submitButtonOptions": {
+    "norender": false
+  },
+  "ui:order": [
+    "name",
+    "description",
+    "policies",
+    "image_id"
+  ],
+  "name": {
+    "ui:placeholder": "Boernebibliotek"
+  },
+  "description": {
+    "ui:widget": "textarea",
+    "ui:options": {
+      "rows": 3
+    },
+    "ui:placeholder": "Optional description of this image configuration"
+  },
+  "policies": {
+    "ui:options": {
+      "orderable": true,
+      "addable": true,
+      "removable": true
+    },
+    "items": {
+      "ui:placeholder": "../policies/bibliotek-selvbetjeningspc.yml"
+    }
+  },
+  "image_id": {
+    "ui:placeholder": "selvbetjeningspc_sonderborg_boernebibliotek"
+  }
+}

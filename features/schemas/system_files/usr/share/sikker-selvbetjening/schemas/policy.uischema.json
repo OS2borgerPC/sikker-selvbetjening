@@ -1,0 +1,249 @@
+{
+  "ui:submitButtonOptions": {
+    "norender": false
+  },
+  "ui:order": [
+    "name",
+    "desktop",
+    "printer",
+    "wifi",
+    "favorite_apps",
+    "firefox",
+    "mesh_agent"
+  ],
+  "name": {
+    "ui:placeholder": "policy-name"
+  },
+  "desktop": {
+    "ui:order": [
+      "background_image_file",
+      "shortcuts_in_menu"
+    ],
+    "background_image_file": {
+      "ui:placeholder": "../assets/bg-default.jpg"
+    },
+    "shortcuts_in_menu": {
+      "ui:options": {
+        "orderable": true,
+        "addable": true,
+        "removable": true
+      },
+      "items": {
+        "ui:placeholder": "org.example.App.desktop"
+      }
+    }
+  },
+  "printer": {
+    "ui:order": [
+      "printers"
+    ],
+    "printers": {
+      "ui:order": [
+        "no_ppd",
+        "with_ppd",
+        "princh"
+      ],
+      "no_ppd": {
+        "ui:options": {
+          "orderable": true,
+          "addable": true,
+          "removable": true
+        },
+        "items": {
+          "ui:order": [
+            "printer-type",
+            "name",
+            "display_name",
+            "description",
+            "ip",
+            "protocol",
+            "page_size",
+            "color_mode",
+            "duplex",
+            "orientation",
+            "is_default"
+          ],
+          "printer-type": {
+            "ui:widget": "hidden"
+          },
+          "name": {
+            "ui:placeholder": "printer_id"
+          },
+          "display_name": {
+            "ui:placeholder": "Printer display name"
+          },
+          "description": {
+            "ui:widget": "textarea",
+            "ui:options": {
+              "rows": 2
+            }
+          },
+          "ip": {
+            "ui:placeholder": "192.168.1.100"
+          },
+          "protocol": {
+            "ui:placeholder": "ipp"
+          },
+          "page_size": {
+            "ui:placeholder": "A4"
+          },
+          "color_mode": {
+            "ui:placeholder": "rgb"
+          },
+          "duplex": {
+            "ui:placeholder": "none"
+          },
+          "orientation": {
+            "ui:placeholder": "portrait"
+          },
+          "is_default": {}
+        }
+      },
+      "with_ppd": {
+        "ui:options": {
+          "orderable": true,
+          "addable": true,
+          "removable": true
+        },
+        "items": {
+          "ui:order": [
+            "printer-type",
+            "name",
+            "display_name",
+            "description",
+            "ip",
+            "protocol",
+            "page_size",
+            "color_mode",
+            "duplex",
+            "orientation",
+            "ppd_file",
+            "is_default"
+          ],
+          "printer-type": {
+            "ui:widget": "hidden"
+          },
+          "name": {
+            "ui:placeholder": "printer_id"
+          },
+          "display_name": {
+            "ui:placeholder": "Printer display name"
+          },
+          "description": {
+            "ui:widget": "textarea",
+            "ui:options": {
+              "rows": 2
+            }
+          },
+          "ip": {
+            "ui:placeholder": "192.168.1.100"
+          },
+          "protocol": {
+            "ui:placeholder": "ipp"
+          },
+          "page_size": {
+            "ui:placeholder": "A4"
+          },
+          "color_mode": {
+            "ui:placeholder": "rgb"
+          },
+          "duplex": {
+            "ui:placeholder": "none"
+          },
+          "orientation": {
+            "ui:placeholder": "portrait"
+          },
+          "ppd_file": {
+            "ui:placeholder": "../assets/printer.ppd"
+          },
+          "is_default": {}
+        }
+      },
+      "princh": {
+        "ui:options": {
+          "orderable": true,
+          "addable": true,
+          "removable": true
+        },
+        "items": {
+          "ui:order": [
+            "printer-type",
+            "name",
+            "display_name",
+            "id",
+            "is_default"
+          ],
+          "printer-type": {
+            "ui:widget": "hidden"
+          },
+          "name": {
+            "ui:placeholder": "printer_id"
+          },
+          "display_name": {
+            "ui:placeholder": "Princh display name"
+          },
+          "id": {
+            "ui:help": "Princh printer id (string or integer)."
+          },
+          "is_default": {}
+        }
+      }
+    }
+  },
+  "wifi": {
+    "ui:order": [
+      "ssid",
+      "psk",
+      "hidden"
+    ],
+    "ssid": {
+      "ui:placeholder": "MyWifi"
+    },
+    "psk": {
+      "ui:widget": "password"
+    },
+    "hidden": {}
+  },
+  "favorite_apps": {
+    "ui:order": [
+      "apps"
+    ],
+    "apps": {
+      "ui:options": {
+        "orderable": true,
+        "addable": true,
+        "removable": true
+      },
+      "items": {
+        "ui:placeholder": "org.mozilla.firefox.desktop"
+      }
+    }
+  },
+  "firefox": {
+    "ui:order": [
+      "urls"
+    ],
+    "urls": {
+      "ui:options": {
+        "orderable": true,
+        "addable": true,
+        "removable": true
+      },
+      "items": {
+        "ui:placeholder": "https://example.org"
+      }
+    }
+  },
+  "mesh_agent": {
+    "ui:order": [
+      "url",
+      "groupid"
+    ],
+    "url": {
+      "ui:placeholder": "https://mesh.example.org/meshagents?id=..."
+    },
+    "groupid": {
+      "ui:placeholder": "mesh-group-id"
+    }
+  }
+}

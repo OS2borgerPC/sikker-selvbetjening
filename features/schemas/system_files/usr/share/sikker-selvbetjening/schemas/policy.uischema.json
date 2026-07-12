@@ -15,6 +15,12 @@
     "ui:placeholder": "policy-name"
   },
   "desktop": {
+    "ui:field": "CollapsibleSectionField",
+    "ui:options": {
+      "title": "Desktop Section",
+      "collapsible": true,
+      "collapsed": true
+    },
     "ui:order": [
       "background_image_file",
       "shortcuts_in_menu"
@@ -34,6 +40,12 @@
     }
   },
   "printer": {
+    "ui:field": "CollapsibleSectionField",
+    "ui:options": {
+      "title": "Printer Section",
+      "collapsible": true,
+      "collapsed": true
+    },
     "ui:order": [
       "printers"
     ],
@@ -191,6 +203,12 @@
     }
   },
   "wifi": {
+    "ui:field": "CollapsibleSectionField",
+    "ui:options": {
+      "title": "Wi-Fi Section",
+      "collapsible": true,
+      "collapsed": true
+    },
     "ui:order": [
       "ssid",
       "psk",
@@ -205,6 +223,12 @@
     "hidden": {}
   },
   "favorite_apps": {
+    "ui:field": "CollapsibleSectionField",
+    "ui:options": {
+      "title": "Favorite Apps",
+      "collapsible": true,
+      "collapsed": true
+    },
     "ui:order": [
       "apps"
     ],
@@ -220,6 +244,12 @@
     }
   },
   "firefox": {
+    "ui:field": "CollapsibleSectionField",
+    "ui:options": {
+      "title": "Firefox",
+      "collapsible": true,
+      "collapsed": true
+    },
     "ui:order": [
       "urls"
     ],
@@ -235,6 +265,12 @@
     }
   },
   "mesh_agent": {
+    "ui:field": "CollapsibleSectionField",
+    "ui:options": {
+      "title": "Mesh Agent",
+      "collapsible": true,
+      "collapsed": true
+    },
     "ui:order": [
       "url",
       "groupid"

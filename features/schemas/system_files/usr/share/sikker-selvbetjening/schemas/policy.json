@@ -48,7 +48,6 @@
         "name": {
           "type": "string",
           "description": "Human-readable policy name. Used as the image name in the build pipeline.",
-          "pattern": "^[a-z][a-z0-9-]*$",
           "minLength": 1
         },
         "desktop": {

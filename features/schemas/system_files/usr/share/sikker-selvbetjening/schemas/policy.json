@@ -8,11 +8,7 @@
     "asset_file_base": {
       "type": "string",
       "pattern": "^/assets/.+",
-      "description": "Asset path under /assets/... (for example /assets/bg-default.jpg).",
-      "x-ssb-file": {
-        "enabled": true,
-        "assetPrefixTemplate": "/assets/"
-      }
+      "description": "Asset path under /assets/... (for example /assets/bg-default.jpg)."
     },
     "asset_file_image": {
       "allOf": [
@@ -20,12 +16,7 @@
           "$ref": "#/$defs/asset_file_base"
         }
       ],
-      "description": "Asset path for an image file.",
-      "x-ssb-file": {
-        "enabled": true,
-        "accept": "image/*",
-        "assetPrefixTemplate": "/assets/"
-      }
+      "description": "Asset path for an image file."
     },
     "asset_file_ppd": {
       "allOf": [
@@ -33,12 +24,7 @@
           "$ref": "#/$defs/asset_file_base"
         }
       ],
-      "description": "Asset path for a printer PPD file.",
-      "x-ssb-file": {
-        "enabled": true,
-        "accept": ".ppd,text/plain,application/octet-stream",
-        "assetPrefixTemplate": "/assets/"
-      }
+      "description": "Asset path for a printer PPD file."
     },
     "policy_entry": {
       "type": "object",

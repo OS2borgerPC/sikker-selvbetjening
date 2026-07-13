@@ -7,12 +7,8 @@
   "$defs": {
     "policy_file_base": {
       "type": "string",
-      "pattern": "^(?:\\.\\./policies|policies)/.+\\.ya?ml$",
-      "description": "Relative policy file path under policies/... (for example ../policies/bibliotek-selvbetjeningspc.yml).",
-      "x-ssb-file": {
-        "enabled": true,
-        "assetPrefixTemplate": "../policies/"
-      }
+      "pattern": "^\\.\\./policies/.+\\.ya?ml$",
+      "description": "Relative policy file path under policies/... (for example ../policies/bibliotek-selvbetjeningspc.yml)."
     },
     "imageconfig_entry": {
       "type": "object",

@@ -26,7 +26,14 @@
       "shortcuts_in_menu"
     ],
     "background_image_file": {
-      "ui:placeholder": "../assets/bg-default.jpg"
+      "ui:placeholder": "/assets/bg-default.jpg",
+      "ui:options": {
+        "assetFile": {
+          "enabled": true,
+          "accept": "image/*",
+          "assetPrefixTemplate": "/assets/"
+        }
+      }
     },
     "shortcuts_in_menu": {
       "ui:options": {
@@ -166,7 +173,14 @@
             "ui:placeholder": "portrait"
           },
           "ppd_file": {
-            "ui:placeholder": "../assets/printer.ppd"
+            "ui:placeholder": "/assets/printer.ppd",
+            "ui:options": {
+              "assetFile": {
+                "enabled": true,
+                "accept": ".ppd,text/plain,application/octet-stream",
+                "assetPrefixTemplate": "/assets/"
+              }
+            }
           },
           "is_default": {}
         }

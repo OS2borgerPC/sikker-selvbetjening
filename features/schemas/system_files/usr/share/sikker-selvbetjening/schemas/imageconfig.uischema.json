@@ -19,12 +19,19 @@
     "ui:placeholder": "Optional description of this image configuration"
   },
   "policies": {
-    "ui:field": "policyReferenceSelect",
     "ui:options": {
-      "policyFile": {
-        "enabled": true,
-        "accept": ".yml,.yaml,text/yaml,application/x-yaml",
-        "assetPrefixTemplate": "../policies/"
+      "orderable": true,
+      "addable": true,
+      "removable": true
+    },
+    "items": {
+      "ui:placeholder": "../policies/bibliotek-selvbetjeningspc.yml",
+      "ui:options": {
+        "policyFile": {
+          "enabled": true,
+          "accept": ".yml,.yaml,text/yaml,application/x-yaml",
+          "assetPrefixTemplate": "../policies/"
+        }
       }
     }
   },

@@ -7,11 +7,11 @@
   "$defs": {
     "asset_file_base": {
       "type": "string",
-      "pattern": "^(?:\\.\\./assets|assets)/.+",
-      "description": "Relative asset path under assets/... (for example ../assets/bg-default.jpg).",
+      "pattern": "^/assets/.+",
+      "description": "Asset path under /assets/... (for example /assets/bg-default.jpg).",
       "x-ssb-file": {
         "enabled": true,
-        "assetPrefixTemplate": "../assets/"
+        "assetPrefixTemplate": "/assets/"
       }
     },
     "asset_file_image": {
@@ -24,7 +24,7 @@
       "x-ssb-file": {
         "enabled": true,
         "accept": "image/*",
-        "assetPrefixTemplate": "../assets/"
+        "assetPrefixTemplate": "/assets/"
       }
     },
     "asset_file_ppd": {
@@ -37,7 +37,7 @@
       "x-ssb-file": {
         "enabled": true,
         "accept": ".ppd,text/plain,application/octet-stream",
-        "assetPrefixTemplate": "../assets/"
+        "assetPrefixTemplate": "/assets/"
       }
     },
     "policy_entry": {
@@ -58,7 +58,7 @@
           "properties": {
             "background_image_file": {
               "$ref": "#/$defs/asset_file_image",
-              "description": "Asset path for the desktop background image, typically as a relative path such as ../assets/bg-default.jpg."
+              "description": "Asset path for the desktop background image, typically as a path such as /assets/bg-default.jpg."
             },
             "shortcuts_in_menu": {
               "type": "array",
@@ -282,7 +282,7 @@
         },
         "ppd_file": {
           "$ref": "#/$defs/asset_file_ppd",
-          "description": "Relative asset path to a PPD file, typically under ../assets/."
+          "description": "Asset path to a PPD file, typically under /assets/."
         },
         "is_default": {
           "type": "boolean",

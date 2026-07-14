@@ -1,8 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "./policy.json",
-  "title": "Sikker Selvbetjening Policy Config",
-  "description": "Schema for a single policy configuration.",
   "$ref": "#/$defs/policy_entry",
   "$defs": {
     "asset_file_base": {

@@ -1,8 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "./imageconfig.json",
-  "title": "Sikker Selvbetjening ImageConfig Config",
-  "description": "Schema for a single imageconfig configuration.",
   "$ref": "#/$defs/imageconfig_entry",
   "$defs": {
     "policy_file_base": {

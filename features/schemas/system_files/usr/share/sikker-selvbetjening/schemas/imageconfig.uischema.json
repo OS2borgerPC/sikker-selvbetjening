@@ -25,6 +25,7 @@
       "removable": true
     },
     "items": {
+      "ui:readonly": true,
       "ui:placeholder": "../policies/bibliotek-selvbetjeningspc.yml"
     }
   },

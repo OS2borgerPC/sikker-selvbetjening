@@ -25,14 +25,7 @@
       "removable": true
     },
     "items": {
-      "ui:placeholder": "../policies/bibliotek-selvbetjeningspc.yml",
-      "ui:options": {
-        "policyFile": {
-          "enabled": true,
-          "accept": ".yml,.yaml,text/yaml,application/x-yaml",
-          "assetPrefixTemplate": "../policies/"
-        }
-      }
+      "ui:placeholder": "../policies/bibliotek-selvbetjeningspc.yml"
     }
   },
   "image_id": {

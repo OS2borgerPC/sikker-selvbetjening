@@ -10,7 +10,7 @@
     "imageconfig_entry": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "policies", "image_id"],
+      "required": ["name", "policies"],
       "properties": {
         "name": {
           "type": "string",

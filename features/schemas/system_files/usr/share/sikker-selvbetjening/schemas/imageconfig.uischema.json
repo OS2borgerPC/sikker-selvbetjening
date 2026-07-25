@@ -5,8 +5,7 @@
   "ui:order": [
     "name",
     "description",
-    "policies",
-    "image_id"
+    "policies"
   ],
   "name": {
     "ui:placeholder": "Boernebibliotek"
@@ -29,6 +28,6 @@
     }
   },
   "image_id": {
-    "ui:placeholder": "selvbetjeningspc_sonderborg_boernebibliotek"
+    "ui:widget": "hidden"
   }
 }

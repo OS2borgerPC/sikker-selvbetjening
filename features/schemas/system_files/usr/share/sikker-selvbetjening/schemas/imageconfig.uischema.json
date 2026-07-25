@@ -2,11 +2,6 @@
   "ui:submitButtonOptions": {
     "norender": false
   },
-  "ui:order": [
-    "name",
-    "description",
-    "policies"
-  ],
   "name": {
     "ui:placeholder": "Boernebibliotek"
   },
